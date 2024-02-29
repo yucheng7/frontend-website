@@ -6,11 +6,11 @@ import { ref } from 'vue'
 const data = ref([])
 const totalCount = ref(0)
 const listCount = ref(0)
-const filterYear = ref('')
+const filterYear = ref(2024)
 const filterSeason = ref('winter')
 const perPage = ref(50)
 const page = ref(1)
-const getanimelist = async () => {
+const getAnimeList = async () => {
     try {
         const res = await axios.get(`https://api.annict.com/v1/works?access_token=C23CjuV8eGIYLnn0qRkUUhDTWdl6KFwuS-ZzzTy9IB0&filter_season=${filterYear.value}-${filterSeason.value}&per_page=${perPage.value}&page=${page.value}`)
         totalCount.value = res.data.total_count
@@ -20,7 +20,7 @@ const getanimelist = async () => {
         listCount.value += 50
         page.value++
         if (listCount.value < totalCount.value) {
-            await getanimelist()
+            await getAnimeList()
         }
         console.log(data.value);
         console.log(filterYear.value);
@@ -29,7 +29,7 @@ const getanimelist = async () => {
     }
 }
 
-const resetanimelist = () => {
+const resetAnimeList = () => {
     data.value = []
     totalCount.value = 0
     listCount.value = 0
@@ -37,11 +37,33 @@ const resetanimelist = () => {
 }
 
 const handleYearChange = () => {
-    resetanimelist()
-    getanimelist()
+    resetAnimeList()
+    getAnimeList()
 }
 
+
+getAnimeList()
+
 // 獲取動漫資料 //
+
+// 獲取動漫製作組資料 //
+
+const staffsdata = ref([])
+const getAnimeStaffList = async (id) => {
+    const res = await axios.get(`https://api.annict.com/v1/staffs?access_token=C23CjuV8eGIYLnn0qRkUUhDTWdl6KFwuS-ZzzTy9IB0&filter_work_id=${id}`)
+    console.log(res.data);
+    staffsdata.value.push(...res.data.staffs)
+    console.log(staffsdata.value);
+}
+
+// 獲取動漫製作組資料 //
+
+// 根據作品id先將製作組名單的數組加入data中
+
+for(let i = 0; i < data.value.length; i++) {
+  console.log(data.value[i].id);
+}
+// 根據作品id先將製作組名單的數組加入data中
 
 // 年份選擇 //
 const yearsCount = ref(0)
@@ -69,7 +91,8 @@ console.log(yearsGroup.value);
                 <div class="animelist-search-switch-year">年份</div>
             </div>
             <input type="text" placeholder="搜尋" value="" class="animelist-search-input">
-            <select class="animelist-search-select" name="" id="" v-model="filterYear" @change="handleYearChange">
+            <select class="animelist-search-select" name="" id="" v-model="filterYear" @change="handleYearChange"
+                placeholder="選擇年份">
                 <option :value="i" v-for="i in yearsGroup" :key="i">{{ i }}</option>
             </select>
         </div>
@@ -79,7 +102,10 @@ console.log(yearsGroup.value);
             <div class="animelist-content-group" v-for="(item, i) in data" :key="i">
                 <div class="animelist-content-item">
                     <div class="animelist-content-item-img">這是圖片區</div>
-                    <div class="animelist-content-item-description">{{ i + 1 }}. {{ item.title }}</div>
+                    <div class="animelist-content-item-description">
+                        <div class="animelist-content-item-description-title">{{ i + 1 }}. {{ item.title }}</div>
+                        <div class="animelist-content-item-description-staff" @beforeinput="getAnimeStaffList(item.id)" v-for="(staff, i) in staffsdata" :key="i" >{{ staff.name }}</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -139,16 +165,22 @@ console.log(yearsGroup.value);
 
     .animelist-content {
         box-shadow: 0 0 5px gray;
+
         .animelist-content-title {
             font-size: 30px;
             text-align: center;
         }
+
         .animelist-content-item {
             display: flex;
+
+            outline: 1px solid black;
+
             .animelist-content-item-img {
-                
+                width: 300px;
+                // height: 300px;
+                background-color: aquamarine;
             }
         }
     }
-}
-</style>
+}</style>
