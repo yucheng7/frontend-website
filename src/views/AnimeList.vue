@@ -173,9 +173,7 @@ console.log(yearsGroup.value);
 
         .animelist-content-item {
             display: flex;
-
             outline: 1px solid black;
-
             .animelist-content-item-img {
                 width: 300px;
                 // height: 300px;
