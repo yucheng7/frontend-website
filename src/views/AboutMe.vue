@@ -49,8 +49,12 @@
                         <div class="usetech-description">使用技術</div>
                     </div>
                     <div class="webscreenshot_item">
-                        <div class="screenshot">作品集縮圖2</div>
-                        <div class="usetech-description">使用技術</div>
+                        <div class="screenshot">
+                            <a href="/animelist">
+                                <img src="..\assets\img2.png" alt="">
+                            </a>
+                        </div>
+                        <div class="usetech-description">Animelist</div>
                     </div>
                 </div>
                 <div class="profile-content-right">
