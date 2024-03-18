@@ -57,7 +57,7 @@ const getAnimeList = async () => {
         } else {
             getAnimeStaffList()
         }
-        console.log(data.value);
+        // console.log(data.value);
         // console.log(filterYear.value);
 
     } catch (error) {
@@ -107,7 +107,7 @@ const getAnimeStaffList = async () => {
         // console.log(idGroup.value.length);
         // console.log(idGroup.value[0].data);
     })
-    console.log(idGroup.value);
+    // console.log(idGroup.value);
     //獲取動漫ID
 
     for (let i = 0; i < idGroup.value.length; i++) {
@@ -128,7 +128,7 @@ for (yearsCount.value = 2024; yearsCount.value >= 1990; yearsCount.value--) {
     yearsGroup.value.push(yearsCount.value)
 }
 
-console.log(yearsGroup.value);
+// console.log(yearsGroup.value);
 // 年份選擇 //
 
 // 獲取輸入的動漫作品資料
@@ -143,8 +143,8 @@ const getSearchAnimeList = async () => {
         searchTypeAnimelist.value.forEach((item, index) => {
 
         })
-        console.log('這是輸入的動漫作品資料')
-        console.log(searchTypeAnimelist.value);
+        // console.log('這是輸入的動漫作品資料')
+        // console.log(searchTypeAnimelist.value);
     } catch (error) {
         console.log('發生錯誤', error)
     }
@@ -231,6 +231,15 @@ const userLogout = () => {
     console.log('登出成功');
 }
 // 註冊登出功能
+
+//回到頂部功能
+const backToTop = () => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    })
+}
+//回到頂部功能
 
 </script>
 
@@ -368,7 +377,7 @@ const userLogout = () => {
                 <div class="animelist-sidetoolbar-item sidetoolbar-nowuser-item" v-if="userState">目前user</div>
                 <div class="animelist-sidetoolbar-item sidetoolbar-favorite-item">我的最愛</div>
                 <div class="animelist-sidetoolbar-item sidetoolbar-logout-item" @click="logoutBox = true" v-if="userState">登出</div>
-                <div class="animelist-sidetoolbar-item sidetoolbar-backtop-item">返回頂端</div>
+                <div class="animelist-sidetoolbar-item sidetoolbar-backtop-item" @click="backToTop">返回頂端</div>
             </div>
         </div>
         <!-- 側邊懸浮工具列 -->
