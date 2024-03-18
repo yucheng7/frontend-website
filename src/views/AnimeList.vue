@@ -1,6 +1,36 @@
 <script setup>
 import axios from 'axios'
 import { ref } from 'vue'
+import firebase from "firebase/compat/app";
+
+import "firebase/compat/auth"
+
+//配置firebase
+// Import the functions you need from the SDKs you need
+// import { initializeApp } from "firebase/app";
+// import initializeApp from "firebase/compat/analytics";
+// import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+    apiKey: "AIzaSyCTqAGZ31eOT4AsKMzGK5ww6qB9f7TAvN4",
+    authDomain: "animelist-data.firebaseapp.com",
+    projectId: "animelist-data",
+    storageBucket: "animelist-data.appspot.com",
+    messagingSenderId: "675562826331",
+    appId: "1:675562826331:web:a1842329db9e00be64ad7e",
+    measurementId: "G-CD2Q1681M7"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+// const analytics = getAnalytics(app);
+const auth = firebase.auth();
+//配置firebase
+
 
 // 獲取動漫資料 //
 const data = ref([])
@@ -62,7 +92,6 @@ const handleYearChange = () => {
 }
 
 getAnimeList()
-
 // 獲取動漫資料 //
 
 // 獲取動漫製作組資料 //
@@ -147,7 +176,61 @@ const handleClickNameSearchType = () => {
 }
 //切換動漫搜尋方式
 
+// 註冊登入功能
+const userEmail = ref('aa102133395@gmail.com')
+const userPassword = ref('123456')
+const userUid = ref('') // 目前登入使用者id
+const loginUser = ref('') // 儲存目前登入使用者
+const loginBox = ref(false) // 登入框顯示
+const userState = ref(false) // 是否為登入狀態
+const logoutBox = ref(false) // 登出框顯示
+const createNewUser = async () => {
+    try {
+        await firebase.auth().createUserWithEmailAndPassword(userEmail.value, userPassword.value)
+        console.log('註冊成功');
+    } catch (error) {
+        console.log(error.message);
+        console.log('註冊失敗');
+    }
+}
+const userLogin = async () => {
+    try {
+        const res = await firebase.auth().signInWithEmailAndPassword(userEmail.value, userPassword.value)
+        console.log('登入成功');
+        console.log(res);
+        userCheck()
+    } catch (error) {
+        console.log(error.message);
+        console.log('登入失敗');
+    }
+}
 
+const userCheck = async () => {
+    const user = firebase.auth().currentUser
+    if (user) {
+        console.log('已登入')
+        console.log(user.uid);
+        userUid.value = user.uid
+        loginUser.value = userEmail.value
+        userEmail.value = ''
+        userPassword.value = ''
+        loginBox.value = false
+        userState.value = true
+    }
+}
+
+
+// 註冊登入功能
+
+// 註冊登出功能
+const userLogout = () => {
+    loginUser.value = ''
+    userState.value = false
+    userUid.value = ''
+    logoutBox.value = false
+    console.log('登出成功');
+}
+// 註冊登出功能
 
 </script>
 
@@ -184,6 +267,7 @@ const handleClickNameSearchType = () => {
                     <div class="animelist-content-item-img">
                         <img v-if="item.images.facebook.og_image_url" :src="item.images.facebook.og_image_url" alt=""
                             srcset="">
+                        <div class="animelist-content-item-img-favorite">我的最愛</div>
                     </div>
                     <div class="animelist-content-item-description">
                         <div class="animelist-content-item-description-title">
@@ -216,7 +300,7 @@ const handleClickNameSearchType = () => {
         </div>
         <!-- 依年份季節搜尋動漫 -->
         <!-- 依動漫名搜尋動漫 -->
-        <div class="animelist-content2" v-if="searchType == 1" style="display: none;">
+        <div class="animelist-content2" v-if="searchType == 1">
             <div class="animelist-content2-title">有關{{ animeTitleSave }}的搜尋結果，共{{ searchTypeAnimelist.length }}部
             </div>
             <div class="animelist-content2-group" v-for="(item, i) in searchTypeAnimelist" :key="i">
@@ -253,24 +337,38 @@ const handleClickNameSearchType = () => {
         </div>
         <!-- 依動漫名搜尋動漫 -->
         <!-- 使用者登入 -->
-        <div class="user-box" style="display: none;">
+        <div class="user-box" v-if="loginBox">
             <div class="user-box-login">
                 <div class="user-box-login-content">
-                    <div class="user-box-login-content-out">退出</div>
-                    <input type="text" class="user-box-login-content-username" value="" placeholder="使用者帳號">
-                    <input type="text" class="user-box-login-content-password" value="" placeholder="使用者密碼">
-                    <button class="user-box-login-content-loginbtn">登入</button>
+                    <div class="user-box-login-content-out" @click="loginBox = false">退出</div>
+                    <input type="text" class="user-box-login-content-username" value="" v-model="userEmail"
+                        placeholder="使用者帳號">
+                    <input type="password" class="user-box-login-content-password" value="" v-model="userPassword"
+                        placeholder="使用者密碼">
+                    <button class="user-box-login-content-loginbtn" @click="userLogin">登入</button>
                 </div>
             </div>
         </div>
         <!-- 使用者登入 -->
+        <!-- 使用者登出 -->
+        <div class="user-logoutmsg" v-if="logoutBox">
+            <div class="user-logoutmsg-content">
+                <div>是否確定要登出?</div>
+                <div class="user-logoutmsg-content-checkbutton">
+                    <button @click="userLogout">確定</button>
+                    <button @click="logoutBox = false">取消</button>
+                </div>
+            </div>
+        </div>
+        <!-- 使用者登出 -->
         <!-- 側邊懸浮工具列 -->
         <div class="animelist-sidetoolbar">
             <div class="animelist-sidetoolbar-box">
-                <div class="animelist-sidetoolbar-item">登入</div>
-                <div class="animelist-sidetoolbar-item">我的最愛</div>
-                <div class="animelist-sidetoolbar-item">登出</div>
-                <div class="animelist-sidetoolbar-item">返回頂端</div>
+                <div class="animelist-sidetoolbar-item sidetoolbar-login-item" @click="loginBox = true" v-if="!userState">登入</div>
+                <div class="animelist-sidetoolbar-item sidetoolbar-nowuser-item" v-if="userState">目前user</div>
+                <div class="animelist-sidetoolbar-item sidetoolbar-favorite-item">我的最愛</div>
+                <div class="animelist-sidetoolbar-item sidetoolbar-logout-item" @click="logoutBox = true" v-if="userState">登出</div>
+                <div class="animelist-sidetoolbar-item sidetoolbar-backtop-item">返回頂端</div>
             </div>
         </div>
         <!-- 側邊懸浮工具列 -->
@@ -309,10 +407,6 @@ const handleClickNameSearchType = () => {
                 align-items: center;
                 width: 100%;
                 cursor: pointer;
-
-                &:hover::after {
-                    width: 100%;
-                }
             }
 
             // .animelist-search-switch-year::after {
@@ -366,7 +460,7 @@ const handleClickNameSearchType = () => {
     }
 
     .animelist-content {
-        box-shadow: 0 0 5px gray;
+
 
         .animelist-content-title {
             font-size: 30px;
@@ -375,7 +469,8 @@ const handleClickNameSearchType = () => {
 
         .animelist-content-item {
             display: flex;
-            outline: 1px solid black;
+            border-top: 1px solid black;
+            box-sizing: border-box;
 
             .animelist-content-item-img {
                 min-width: 571px;
@@ -383,15 +478,34 @@ const handleClickNameSearchType = () => {
                 background-color: aquamarine;
                 display: flex;
                 justify-content: center;
+                position: relative;
 
                 img {
                     height: 300px;
                     object-fit: contain;
                 }
+
+                .animelist-content-item-img-favorite {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    background-color: aliceblue;
+                    width: 50px;
+                    height: 50px;
+
+                    &:hover {
+                        cursor: pointer;
+                        border: 1px solid black;
+                        background-color: white;
+                        box-sizing: border-box;
+                    }
+                }
             }
 
             .animelist-content-item-description {
                 padding: 10px;
+                box-sizing: border-box;
+                border-left: 1px solid black;
 
                 .animelist-content-item-description-title {
                     .animelist-content-item-description-title-name {
@@ -478,7 +592,6 @@ const handleClickNameSearchType = () => {
         background-color: rgba(0, 0, 0, 0.5);
 
         .user-box-login {
-            opacity: 1;
             position: fixed;
             top: 50%;
             left: 50%;
@@ -544,6 +657,43 @@ const handleClickNameSearchType = () => {
         }
     }
 
+    .user-logoutmsg {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+
+        .user-logoutmsg-content {
+            width: 300px;
+            height: 300px;
+            background-color: aqua;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+            font-size: 30px;
+
+            .user-logoutmsg-content-checkbutton {
+                display: flex;
+                justify-content: space-evenly;
+
+                button {
+                    font-size: 20px;
+                    padding: 10px;
+                    width: 30%;
+                    margin: 0 auto;
+                    text-align: center;
+                }
+            }
+        }
+    }
+
     .animelist-sidetoolbar {
         position: absolute;
         top: 0;
@@ -579,19 +729,24 @@ const handleClickNameSearchType = () => {
                     background-color: gray;
                     color: white;
                 }
+            }
 
-                &:nth-child(2) {
+            .sidetoolbar-nowuser-item {
+
+            }
+
+            .sidetoolbar-favorite-item {
                     top: 210px;
                 }
 
-                &:nth-child(3) {
+            .sidetoolbar-logout-item {
                     top: 270px;
                 }
 
-                &:nth-child(4) {
+            .sidetoolbar-backtop-item {
                     top: 330px;
                 }
-            }
+            
         }
 
 
