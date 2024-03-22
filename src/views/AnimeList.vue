@@ -255,7 +255,7 @@ const favoriteAnimeList = ref({
             {
                 email: "aa102133395@gmail.com",
                 uid: "bd9nhZ68dIdfJg52hgeWv4L7uG33",
-                loveanimelist: [],
+                loveanimelist: [12811, 12795, 12598, 11111, 12111, 12311, 12341, 12345],
             },
             {
                 email: "aa3askpdofkpas58@gmail.com",
@@ -282,7 +282,7 @@ const cancelFavoriteAnime = (animeid) => {
     const userIndex = favoriteAnimeList.value.data.user.findIndex((item) => {
         return item.uid == userUid.value
     }) //獲得當前登入使用者的資料位於數列中的索引值
-    const res = favoriteAnimeList.value.filter((item) => item != animeid)
+    const res = favoriteAnimeList.value.data.user[userIndex].loveanimelist.filter((item) => item != animeid)
     favoriteAnimeList.value.data.user[userIndex].loveanimelist = res
     console.log(animeid + "已刪除");
 }
@@ -314,16 +314,17 @@ const loginUserIndex = ref('')
 const loginUserFavoriteList = ref([])
 const loginUserFavoriteListId = ref([])
 const getFavoriteList = () => {
+    loginUserFavoriteList.value = []
     loginUserIndex.value = favoriteAnimeList.value.data.user.findIndex((item) => {
         return item.uid == userUid.value
     })
     loginUserFavoriteListId.value = favoriteAnimeList.value.data.user[loginUserIndex.value].loveanimelist
-    loginUserFavoriteListId.value.forEach(async(item) => {
+    loginUserFavoriteListId.value.forEach(async (item) => {
         const res = await axios.get(`https://api.annict.com/v1/works?access_token=C23CjuV8eGIYLnn0qRkUUhDTWdl6KFwuS-ZzzTy9IB0&filter_ids=${item}`)
         loginUserFavoriteList.value.push(...res.data.works)
         console.log(loginUserFavoriteList.value);
     })
-    
+
 }//獲取目前登入使用者最愛列表索引
 
 
@@ -356,12 +357,12 @@ const getFavoriteList = () => {
                 <button v-if="searchType == 2" @click="searchType = 0">返回</button>
             </div>
             <!-- 頂部功能區塊 -->
-            
+
             <!-- 依年份季節搜尋動漫 -->
             <div class="animelist-content" v-if="searchType == 0">
                 <div class="animelist-content-title">這是animelist搜尋結果，{{ filterYear }}年{{ seasonChinese }}總共{{
-                        data.length
-                    }}部
+                    data.length
+                }}部
                 </div>
                 <div class="animelist-content-group" v-for="(item, i) in data" :key="i">
                     <div class="animelist-content-item">
@@ -385,9 +386,9 @@ const getFavoriteList = () => {
                                 <div class="animelist-content-item-description-data-mediatext">類型:{{ item.media_text }}
                                 </div>
                                 <div class="animelist-content-item-description-data-officialsiteurl">官網:{{
-                        item.official_site_url }}</div>
+                    item.official_site_url }}</div>
                                 <div class="animelist-content-item-description-data-seasonnametext">季度:{{
-                        item.season_name_text }}</div>
+                    item.season_name_text }}</div>
                                 <div class="animelist-content-item-description-data-staffslist">
                                     <div class="animelist-content-item-description-data-staffslist-title">製作組:</div>
                                     <div class="animelist-content-item-description-data-staffslist-des"
@@ -452,9 +453,11 @@ const getFavoriteList = () => {
             <!-- 我的最愛列表 -->
             <div class="animelist-favoritelist" v-if="searchType == 2">
                 <div class="animelist-favoritelist-content">
-                    <ul class="favoritelist-group" v-for="(item, index) in loginUserFavoriteList" :key="index">
-                        <li class="favoritelist-item">
-                            {{ item }}
+                    <ul class="favoritelist-group">
+                        <li class="favoritelist-item" v-for="(item, index) in loginUserFavoriteList" :key="index">
+                            <div class="favoritelist-item-title">
+                                {{ item.title }}
+                            </div>
                         </li>
                     </ul>
                 </div>
@@ -492,7 +495,10 @@ const getFavoriteList = () => {
                         @click="loginBox = true, sideToolShow = false" v-if="!userState">登入</div>
                     <div class="animelist-sidetoolbar-item sidetoolbar-nowuser-item" v-if="userState"
                         @click="userInfoBox = true">目前user</div>
-                    <div class="animelist-sidetoolbar-item sidetoolbar-favorite-item" v-if="userState" @click="searchType = 2, getFavoriteList()">我的最愛</div>
+                    <div class="animelist-sidetoolbar-item sidetoolbar-favorite-item" v-if="userState && searchType == 0 || searchType == 1"
+                        @click="searchType = 2, getFavoriteList()">我的最愛</div>
+                    <div class="animelist-sidetoolbar-item sidetoolbar-backhome-item" v-if="userState && searchType == 2"
+                        @click="searchType = 0">返回首頁</div>
                     <div class="animelist-sidetoolbar-item sidetoolbar-logout-item"
                         @click="logoutBox = true, sideToolShow = false" v-if="userState">登出</div>
                     <div class="animelist-sidetoolbar-item sidetoolbar-backtop-item" @click="backToTop">返回頂端</div>
@@ -756,7 +762,9 @@ const getFavoriteList = () => {
         }
 
         .animelist-favoritelist {
+
             .animelist-favoritelist-content {
+                
                 .favoritelist-group {
                     list-style: none;
                 }
@@ -916,6 +924,10 @@ const getFavoriteList = () => {
                 .sidetoolbar-nowuser-item {}
 
                 .sidetoolbar-favorite-item {
+                    top: 210px;
+                }
+
+                .sidetoolbar-backhome-item {
                     top: 210px;
                 }
 
