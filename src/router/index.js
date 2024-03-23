@@ -17,6 +17,9 @@ const router = createRouter({
     {
       path: '/animelist',
       name: 'animelist',
+      // meta: {
+      //   keepAlive: false
+      // },
       component: () => import('../views/AnimeList.vue')
     }
     // {
