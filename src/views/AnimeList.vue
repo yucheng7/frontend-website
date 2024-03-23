@@ -42,6 +42,7 @@ const allSeason = [['spring', '春季'], ['summer', '夏季'], ['autumn', '秋�
 const perPage = ref(50)
 const page = ref(1)
 const seasonChinese = ref('春季')
+const isReloading = ref(false)
 
 const getAnimeList = async () => {
     try {
@@ -86,9 +87,15 @@ const seasonChineseChange = () => {
 }
 
 const handleYearChange = () => {
+    isReloading.value = true
+    console.log('啟動過渡');
     resetAnimeList()
     getAnimeList()
     seasonChineseChange()
+    setTimeout(() => {
+        isReloading.value = false
+        console.log("過渡結束");
+    }, 300)
 }
 
 getAnimeList()
@@ -113,7 +120,7 @@ const getAnimeStaffList = async () => {
     for (let i = 0; i < idGroup.value.length; i++) {
         const res = await axios.get(`https://api.annict.com/v1/staffs?access_token=C23CjuV8eGIYLnn0qRkUUhDTWdl6KFwuS-ZzzTy9IB0&filter_work_id=${idGroup.value[i]}`)
         // console.log(i+1+'完成');
-        // console.log(res.data.staffs);
+        console.log(res.data.staffs);
         data.value[i].staffs = res.data.staffs // 在data新增staffs屬性並將值設為res.data.staffs
     }
 }
@@ -151,6 +158,7 @@ const handleSearchChange = () => {
     // 先把變量重置
     searchTypeAnimelist.value = []
     // 先把變量重置
+
     //開始獲取搜尋相關動漫
     getSearchAnimeList()
     //開始獲取搜尋相關動漫
@@ -161,13 +169,17 @@ getSearchAnimeList()
 
 //切換動漫搜尋方式
 //0 = 年份 1 = 作品名
-const searchType = ref(0)
+const pageType = ref(0)
 //0 = 年份 1 = 作品名 2=我的最愛列表
 const handleClickYearSearchType = () => {
-    searchType.value = 0
+    pageType.value = 0
 }
 const handleClickNameSearchType = () => {
-    searchType.value = 1
+    pageType.value = 1
+}
+
+const handleClickFavoritePageType = () => {
+    pageType.value = 2
 }
 //切換動漫搜尋方式
 //側邊工具列顯示
@@ -330,6 +342,8 @@ const getFavoriteList = () => {
 
 //獲取目前登入使用者最愛列表
 
+
+
 </script>
 
 <template>
@@ -338,136 +352,151 @@ const getFavoriteList = () => {
         <div class="container">
             <!-- 頂部功能區塊 -->
             <div class="animelist-search">
-                <div class="animelist-search-switch" v-show="searchType == 0 || searchType == 1">
-                    <div class="animelist-search-switch-year" @click="handleClickYearSearchType">年份</div>
-                    <div class="animelist-search-switch-name" @click="handleClickNameSearchType">作品名</div>
+                <div class="animelist-search-switch" v-show="true">
+                    <div :class="{ 'animelist-search-switch-year': true, 'highlight': pageType == 0 }"
+                        @click="handleClickYearSearchType">年份</div>
+                    <div :class="{ 'animelist-search-switch-name': true, 'highlight': pageType == 1 }"
+                        @click="handleClickNameSearchType">作品名</div>
+                    <div :class="{ 'animelist-search-switch-name': true, 'highlight': pageType == 2 }"
+                        @click="handleClickFavoritePageType" v-if="userState">
+                        我的最愛
+                    </div>
                 </div>
                 <div class="animelist-search-select-bar">
                     <input type="text" class="animelist-search-input" placeholder="輸入日文作品名搜尋" value=""
-                        v-model="animeTitle" @input="handleSearchChange" v-show="searchType == 1">
+                        v-model="animeTitle" @input="handleSearchChange" v-show="pageType == 1">
                     <select class="animelist-search-select-year" name="" id="" v-model="filterYear"
-                        @change="handleYearChange" placeholder="選擇年份" v-show="searchType == 0">
+                        @change="handleYearChange" placeholder="選擇年份" v-show="pageType == 0">
                         <option :value="i" v-for="i in yearsGroup" :key="i">{{ i }}</option>
                     </select>
                     <select class="animelist-search-select-season" name="" id="" v-model="filterSeason"
-                        @change="handleYearChange" placeholder="選擇季節" v-show="searchType == 0">
+                        @change="handleYearChange" placeholder="選擇季節" v-show="pageType == 0">
                         <option :value="i[0]" v-for="i in allSeason" :key="i">{{ i[1] }}</option>
                     </select>
                 </div>
-                <button v-if="searchType == 2" @click="searchType = 0">返回</button>
             </div>
             <!-- 頂部功能區塊 -->
-
             <!-- 依年份季節搜尋動漫 -->
-            <div class="animelist-content" v-if="searchType == 0">
-                <div class="animelist-content-title">這是animelist搜尋結果，{{ filterYear }}年{{ seasonChinese }}總共{{
+            <Transition name="fade">
+                <div class="animelist-content" v-if="pageType == 0">
+                    <div class="animelist-content-title">{{ filterYear }}年{{ seasonChinese }}總共{{
                     data.length
                 }}部
-                </div>
-                <div class="animelist-content-group" v-for="(item, i) in data" :key="i">
-                    <div class="animelist-content-item">
-                        <div class="animelist-content-item-img">
-                            <img v-if="item.images.facebook.og_image_url" :src="item.images.facebook.og_image_url"
-                                alt="" srcset="">
-                            <div class="animelist-content-item-img-favorite"
-                                v-if="userState && !checkAnimeInFavoriteList(userUid, item.id)"
-                                @click="addFavorite(userUid, item.id)">未加入最愛</div>
-                            <div class="animelist-content-item-img-favorite"
-                                v-if="userState && checkAnimeInFavoriteList(userUid, item.id)"
-                                @click="cancelFavoriteAnime(item.id)">已加入最愛</div>
-                        </div>
+                    </div>
+                    <div class="animelist-content-group">
+                        <div :class="{ 'animelist-content-item': true }" v-for="(item, i) in data" :key="i">
+                            <div class="animelist-content-item-img">
+                                <img v-if="item.images.facebook.og_image_url" :src="item.images.facebook.og_image_url"
+                                    alt="" srcset="">
+                                <div class="animelist-content-item-img-favorite"
+                                    v-if="userState && !checkAnimeInFavoriteList(userUid, item.id)"
+                                    @click="addFavorite(userUid, item.id)">未加入最愛</div>
+                                <div class="animelist-content-item-img-favorite"
+                                    v-if="userState && checkAnimeInFavoriteList(userUid, item.id)"
+                                    @click="cancelFavoriteAnime(item.id)">已加入最愛</div>
+                            </div>
 
-                        <div class="animelist-content-item-description">
-                            <div class="animelist-content-item-description-title">
-                                <div class="animelist-content-item-description-title-name">{{ item.title }}
-                                </div>
-                            </div>
-                            <div class="animelist-content-item-description-data">
-                                <div class="animelist-content-item-description-data-mediatext">類型:{{ item.media_text }}
-                                </div>
-                                <div class="animelist-content-item-description-data-officialsiteurl">官網:{{
-                    item.official_site_url }}</div>
-                                <div class="animelist-content-item-description-data-seasonnametext">季度:{{
-                    item.season_name_text }}</div>
-                                <div class="animelist-content-item-description-data-staffslist">
-                                    <div class="animelist-content-item-description-data-staffslist-title">製作組:</div>
-                                    <div class="animelist-content-item-description-data-staffslist-des"
-                                        v-for="(i, index) in item.staffs" :key="index">
-                                        <div>{{ i.role_other ? i.role_other : i.role_text }}</div>
-                                        <div> : </div>
-                                        <div>{{ i.name }}</div>
+                            <div class="animelist-content-item-description">
+                                <div class="animelist-content-item-description-title">
+                                    <div class="animelist-content-item-description-title-name">{{ item.title }}
                                     </div>
-                                    <div></div>
                                 </div>
+                                <div class="animelist-content-item-description-data">
+                                    <div class="animelist-content-item-description-data-mediatext">類型:{{ item.media_text
+                                        }}
+                                    </div>
+                                    <div class="animelist-content-item-description-data-officialsiteurl">官網:{{
+                    item.official_site_url }}</div>
+                                    <div class="animelist-content-item-description-data-seasonnametext">季度:{{
+                    item.season_name_text }}</div>
+                                    <div class="animelist-content-item-description-data-staffslist">
+                                        <div class="animelist-content-item-description-data-staffslist-title">製作組:</div>
+                                        <div class="animelist-content-item-description-data-staffslist-des"
+                                            v-for="(i, index) in item.staffs" :key="index">
+                                            <div>{{ i.role_other ? i.role_other : i.role_text }}</div>
+                                            <div> : </div>
+                                            <div>{{ i.name }}</div>
+                                        </div>
+                                        <div></div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div>ID: {{ item.id }}</div>
                             </div>
-                            <br />
-                            <div>ID: {{ item.id }}</div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </Transition>
             <!-- 依年份季節搜尋動漫 -->
             <!-- 依動漫名搜尋動漫 -->
-            <div class="animelist-content2" v-if="searchType == 1">
-                <div class="animelist-content2-title">有關{{ animeTitleSave }}的搜尋結果，共{{ searchTypeAnimelist.length }}部
-                </div>
-                <div class="animelist-content2-group" v-for="(item, i) in searchTypeAnimelist" :key="i">
-                    <div class="animelist-content2-item">
-                        <div class="animelist-content2-item-img">
-                            <img v-if="item.images.facebook.og_image_url" :src="item.images.facebook.og_image_url"
-                                alt="無此圖片" srcset="">
-                            <div class="animelist-content2-item-img-favorite"
-                                v-if="userState && !checkAnimeInFavoriteList(userUid, item.id)"
-                                @click="addFavorite(userUid, item.id)">未加入最愛</div>
-                            <div class="animelist-content2-item-img-favorite"
-                                v-if="userState && checkAnimeInFavoriteList(userUid, item.id)"
-                                @click="cancelFavoriteAnime(item.id)">已加入最愛</div>
-                        </div>
-                        <div class="animelist-content2-item-description">
-                            <div class="animelist-content2-item-description-title">
-                                <div class="animelist-content2-item-description-title-name">{{ i + 1 }}.{{ item.title }}
-                                </div>
+            <Transition name="fade">
+                <div class="animelist-content2" v-if="pageType == 1">
+                    <div class="animelist-content2-title">有關{{ animeTitleSave }}的搜尋結果，共{{ searchTypeAnimelist.length }}部
+                    </div>
+                    <div class="animelist-content2-group">
+                        <div class="animelist-content2-item" v-for="(item, i) in searchTypeAnimelist" :key="i">
+                            <div class="animelist-content2-item-img">
+                                <img v-if="item.images.facebook.og_image_url" :src="item.images.facebook.og_image_url"
+                                    alt="無此圖片" srcset="">
+                                <div class="animelist-content2-item-img-favorite"
+                                    v-if="userState && !checkAnimeInFavoriteList(userUid, item.id)"
+                                    @click="addFavorite(userUid, item.id)">未加入最愛</div>
+                                <div class="animelist-content2-item-img-favorite"
+                                    v-if="userState && checkAnimeInFavoriteList(userUid, item.id)"
+                                    @click="cancelFavoriteAnime(item.id)">已加入最愛</div>
                             </div>
-                            <div class="animelist-content2-item-description-data">
-                                <div class="animelist-content2-item-description-data-mediatext">類型:{{ item.media_text }}
-                                </div>
-                                <div class="animelist-content2-item-description-data-officialsiteurl">官網:
-                                    {{ item.official_site_url }}</div>
-                                <div class="animelist-content2-item-description-data-seasonnametext">季度:
-                                    {{ item.season_name_text }}</div>
-                                <div class="animelist-content2-item-description-data-staffslist">
-                                    <div class="animelist-content2-item-description-data-staffslist-title">製作組:</div>
-                                    <div class="animelist-content2-item-description-data-staffslist-des">
-                                        <div>職位</div>
-                                        <div> : </div>
-                                        <div>名字</div>
+                            <div class="animelist-content2-item-description">
+                                <div class="animelist-content2-item-description-title">
+                                    <div class="animelist-content2-item-description-title-name">{{ i + 1 }}.{{
+                    item.title }}
                                     </div>
-                                    <div></div>
+                                </div>
+                                <div class="animelist-content2-item-description-data">
+                                    <div class="animelist-content2-item-description-data-mediatext">類型:{{
+                    item.media_text }}
+                                    </div>
+                                    <div class="animelist-content2-item-description-data-officialsiteurl">官網:
+                                        {{ item.official_site_url }}</div>
+                                    <div class="animelist-content2-item-description-data-seasonnametext">季度:
+                                        {{ item.season_name_text }}</div>
+                                    <div class="animelist-content2-item-description-data-staffslist">
+                                        <div class="animelist-content2-item-description-data-staffslist-title">製作組:
+                                        </div>
+                                        <div class="animelist-content2-item-description-data-staffslist-des">
+                                            <div>職位</div>
+                                            <div> : </div>
+                                            <div>名字</div>
+                                        </div>
+                                        <div></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </Transition>
             <!-- 依動漫名搜尋動漫 -->
             <!-- 我的最愛列表 -->
-            <div class="animelist-favoritelist" v-if="searchType == 2">
-                <div class="animelist-favoritelist-content">
-                    <ul class="favoritelist-group">
-                        <li class="favoritelist-item" v-for="(item, index) in loginUserFavoriteList" :key="index">
-                            <div class="favoritelist-item-title">
-                                {{ item.title }}
-                            </div>
-                        </li>
-                    </ul>
+            <Transition name="fade">
+                <div class="animelist-favoritelist" v-if="pageType == 2">
+                    <div class="animelist-favoritelist-content">
+                        <ul class="favoritelist-group">
+                            <li class="favoritelist-item" v-for="(item, index) in loginUserFavoriteList" :key="index">
+                                <div class="favoritelist-item-title">
+                                    {{ item.title }}
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
+            </Transition>
             <!-- 我的最愛列表 -->
             <!-- 使用者登入 -->
             <div class="user-box" v-if="loginBox">
                 <div class="user-box-login">
                     <div class="user-box-login-content">
-                        <div class="user-box-login-content-out" @click="loginBox = false, sideToolShow = true">退出</div>
+                        <div class="user-box-login-content-out" @click="loginBox = false, sideToolShow = true">退出
+                        </div>
                         <input type="text" class="user-box-login-content-username" value="" v-model="userEmail"
                             placeholder="使用者帳號">
                         <input type="password" class="user-box-login-content-password" value="" v-model="userPassword"
@@ -495,10 +524,13 @@ const getFavoriteList = () => {
                         @click="loginBox = true, sideToolShow = false" v-if="!userState">登入</div>
                     <div class="animelist-sidetoolbar-item sidetoolbar-nowuser-item" v-if="userState"
                         @click="userInfoBox = true">目前user</div>
-                    <div class="animelist-sidetoolbar-item sidetoolbar-favorite-item" v-if="userState && searchType == 0 || searchType == 1"
-                        @click="searchType = 2, getFavoriteList()">我的最愛</div>
-                    <div class="animelist-sidetoolbar-item sidetoolbar-backhome-item" v-if="userState && searchType == 2"
-                        @click="searchType = 0">返回首頁</div>
+                    <div class="animelist-sidetoolbar-item sidetoolbar-favorite-item"
+                        v-if="userState && pageType == 0 || userState && pageType == 1"
+                        @click="pageType = 2, getFavoriteList()">
+                        我的最愛
+                    </div>
+                    <div class="animelist-sidetoolbar-item sidetoolbar-backhome-item" v-if="userState && pageType == 2"
+                        @click="pageType = 0">返回首頁</div>
                     <div class="animelist-sidetoolbar-item sidetoolbar-logout-item"
                         @click="logoutBox = true, sideToolShow = false" v-if="userState">登出</div>
                     <div class="animelist-sidetoolbar-item sidetoolbar-backtop-item" @click="backToTop">返回頂端</div>
@@ -523,31 +555,30 @@ const getFavoriteList = () => {
 
         </div>
     </div>
-
-
 </template>
 
 <style scoped lang="scss">
 .main {
     background-color: aliceblue;
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
+    // scroll-behavior: smooth;
 
     .container {
         position: relative;
         width: 1200px;
         box-sizing: border-box;
         background-color: white;
+        box-shadow: 0 0 5px gray;
 
         .animelist-search {
-            border: 1px solid black;
+            border-bottom: 1px solid black;
             display: flex;
             justify-content: space-evenly;
             align-items: center;
             height: 100px;
-            border-radius: 10px;
             width: 100%;
             box-sizing: border-box;
 
@@ -626,6 +657,8 @@ const getFavoriteList = () => {
             .animelist-content-title {
                 font-size: 30px;
                 text-align: center;
+                height: 50px;
+                line-height: 50px;
             }
 
             .animelist-content-item {
@@ -693,16 +726,19 @@ const getFavoriteList = () => {
         }
 
         .animelist-content2 {
-            box-shadow: 0 0 5px gray;
+            box-sizing: border-box;
 
             .animelist-content2-title {
                 font-size: 30px;
                 text-align: center;
+                height: 50px;
+                line-height: 50px;
             }
 
             .animelist-content2-item {
                 display: flex;
-                outline: 1px solid black;
+                border-top: 1px solid black;
+                box-sizing: border-box;
 
                 .animelist-content2-item-img {
                     min-width: 571px;
@@ -736,6 +772,8 @@ const getFavoriteList = () => {
 
                 .animelist-content2-item-description {
                     padding: 10px;
+                    box-sizing: border-box;
+                    border-left: 1px solid black;
 
                     .animelist-content2-item-description-title {
                         .animelist-content2-item-description-title-name {
@@ -762,9 +800,7 @@ const getFavoriteList = () => {
         }
 
         .animelist-favoritelist {
-
             .animelist-favoritelist-content {
-                
                 .favoritelist-group {
                     list-style: none;
                 }
@@ -1032,17 +1068,26 @@ const getFavoriteList = () => {
     }
 }
 
-.show {
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s ease-out;
+}
+
+.fade-enter-from,
+.fade-leave-to {
     opacity: 0;
 }
 
-// 通用style
-.fade {
-    transition: opacity 0.2s linear;
+.reloading {
+    transform: scale(1.1);
+    transition: all 0.5s ease;
 }
 
-.colortored {
+
+.highlight {
     color: red;
+    transform: scale(1.1);
+    font-weight: bolder;
+    transition: all 0.1s ease-in;
 }
-
-// 通用style</style>
+</style>

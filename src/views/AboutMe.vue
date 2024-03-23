@@ -50,9 +50,9 @@
                     </div>
                     <div class="webscreenshot_item">
                         <div class="screenshot">
-                            <a href="/animelist">
+                            <router-link to="/animelist" class="transition-link">
                                 <img src="..\assets\img2.png" alt="">
-                            </a>
+                            </router-link>
                         </div>
                         <div class="usetech-description">Animelist</div>
                     </div>
@@ -281,7 +281,7 @@
     }
 }
 
-.bottom-aria {
-    width: 100%;
-    background-color: chocolate;
-}</style>
+.transition-link {
+    transition: opacity 0.5s;
+}
+</style>
