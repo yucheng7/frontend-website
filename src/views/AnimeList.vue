@@ -1079,7 +1079,7 @@ const getFavoriteList = () => {
 }
 
 .reloading {
-    transform: scale(1.1);
+    transform: scale(1.2);
     transition: all 0.5s ease;
 }
 
