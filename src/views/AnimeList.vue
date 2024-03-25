@@ -1273,7 +1273,7 @@ const deleteFavoritelistItem = (animeid) => {
                     &:active {
                         scale: 1 !important;
                         background-color: gray;
-                        color: white;
+                        color: white !important;
                     }
                 }
             }
