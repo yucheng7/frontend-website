@@ -1,6 +1,6 @@
 <script setup>
 import axios from 'axios'
-import { ref } from 'vue'
+import { ref, setTransitionHooks } from 'vue'
 import firebase from "firebase/compat/app";
 
 import "firebase/compat/auth"
@@ -42,7 +42,6 @@ const allSeason = [['spring', '春季'], ['summer', '夏季'], ['autumn', '秋�
 const perPage = ref(50)
 const page = ref(1)
 const seasonChinese = ref('春季')
-const isReloading = ref(false)
 
 const getAnimeList = async () => {
     try {
@@ -87,15 +86,9 @@ const seasonChineseChange = () => {
 }
 
 const handleYearChange = () => {
-    isReloading.value = true
-    console.log('啟動過渡');
     resetAnimeList()
     getAnimeList()
     seasonChineseChange()
-    setTimeout(() => {
-        isReloading.value = false
-        console.log("過渡結束");
-    }, 300)
 }
 
 getAnimeList()
@@ -120,7 +113,7 @@ const getAnimeStaffList = async () => {
     for (let i = 0; i < idGroup.value.length; i++) {
         const res = await axios.get(`https://api.annict.com/v1/staffs?access_token=C23CjuV8eGIYLnn0qRkUUhDTWdl6KFwuS-ZzzTy9IB0&filter_work_id=${idGroup.value[i]}`)
         // console.log(i+1+'完成');
-        console.log(res.data.staffs);
+        // console.log(res.data.staffs);
         data.value[i].staffs = res.data.staffs // 在data新增staffs屬性並將值設為res.data.staffs
     }
 }
@@ -179,6 +172,7 @@ const handleClickNameSearchType = () => {
 }
 
 const handleClickFavoritePageType = () => {
+    getFavoriteList()
     pageType.value = 2
 }
 //切換動漫搜尋方式
@@ -216,18 +210,22 @@ const userLogin = async () => {
     }
 }
 
-const userCheck = async () => {
+const userCheck = () => {
     const user = firebase.auth().currentUser
     if (user) {
         console.log('已登入')
         console.log(user.uid);
         userUid.value = user.uid
         loginUser.value = userEmail.value
-        userEmail.value = ''
-        userPassword.value = ''
+        favoriteAnimeList.value.data.user.push({
+            email: userEmail.value,
+            uid: userUid.value,
+            loveanimelist: []
+        })
         loginBox.value = false
         userState.value = true
         sideToolShow.value = true
+
     }
 }
 
@@ -236,6 +234,8 @@ const userCheck = async () => {
 
 // 註冊登出功能
 const userLogout = () => {
+    // userEmail.value = ''
+    // userPassword.value = ''
     loginUser.value = ''
     userState.value = false
     userUid.value = ''
@@ -259,8 +259,8 @@ const favoriteAnimeList = ref({
     data: {
         user: [
             {
-                email: "aa39532058@gmail.com",
-                uid: "bd9nhZ68dfJg52h8464684L7uG44",
+                email: "dfdf164646@gmail.com",
+                uid: "Urmiesdfdsfdsfsdfs46RfNIt9i2",
                 loveanimelist: [],
                 // 假資料1
             },
@@ -338,11 +338,23 @@ const getFavoriteList = () => {
     })
 
 }//獲取目前登入使用者最愛列表索引
-
-
 //獲取目前登入使用者最愛列表
 
+//判斷頁面是否滾動離開頂部功能
+const windowScrollTop = ref(0)
 
+window.addEventListener('scroll', () => {
+    windowScrollTop.value = window.scrollY
+    console.log(windowScrollTop.value);
+})
+//判斷頁面是否滾動離開頂部功能
+
+//我的最愛列表-刪除我的最愛項目
+const deleteFavoritelistItem = (animeid) => {
+    cancelFavoriteAnime(animeid)
+    getFavoriteList()
+}
+//我的最愛列表-刪除我的最愛項目
 
 </script>
 
@@ -351,145 +363,130 @@ const getFavoriteList = () => {
         <!-- "金鑰" C23CjuV8eGIYLnn0qRkUUhDTWdl6KFwuS-ZzzTy9IB0 -->
         <div class="container">
             <!-- 頂部功能區塊 -->
-            <div class="animelist-search">
+            <div :class="{ 'animelist-search': true, 'cancelborderbottom': pageType == 2 }">
                 <div class="animelist-search-switch" v-show="true">
                     <div :class="{ 'animelist-search-switch-year': true, 'highlight': pageType == 0 }"
-                        @click="handleClickYearSearchType">年份</div>
+                        @click="handleClickYearSearchType">季度搜尋</div>
                     <div :class="{ 'animelist-search-switch-name': true, 'highlight': pageType == 1 }"
-                        @click="handleClickNameSearchType">作品名</div>
-                    <div :class="{ 'animelist-search-switch-name': true, 'highlight': pageType == 2 }"
+                        @click="handleClickNameSearchType">作品名搜尋</div>
+                    <div :class="{ 'animelist-search-switch-favorite': true, 'highlight': pageType == 2 }"
                         @click="handleClickFavoritePageType" v-if="userState">
                         我的最愛
                     </div>
                 </div>
-                <div class="animelist-search-select-bar">
-                    <input type="text" class="animelist-search-input" placeholder="輸入日文作品名搜尋" value=""
-                        v-model="animeTitle" @input="handleSearchChange" v-show="pageType == 1">
-                    <select class="animelist-search-select-year" name="" id="" v-model="filterYear"
-                        @change="handleYearChange" placeholder="選擇年份" v-show="pageType == 0">
-                        <option :value="i" v-for="i in yearsGroup" :key="i">{{ i }}</option>
-                    </select>
-                    <select class="animelist-search-select-season" name="" id="" v-model="filterSeason"
-                        @change="handleYearChange" placeholder="選擇季節" v-show="pageType == 0">
-                        <option :value="i[0]" v-for="i in allSeason" :key="i">{{ i[1] }}</option>
-                    </select>
-                </div>
+                <Transition name="fade">
+                    <div class="animelist-search-select-bar" v-if="pageType != 2">
+                        <input type="text" class="animelist-search-input" placeholder="輸入日文作品名搜尋" value=""
+                            v-model="animeTitle" @input="handleSearchChange" v-show="pageType == 1">
+                        <select class="animelist-search-select-year" name="" id="" v-model="filterYear"
+                            @change="handleYearChange" placeholder="選擇年份" v-show="pageType == 0">
+                            <option :value="i" v-for="i in yearsGroup" :key="i">{{ i }}</option>
+                        </select>
+                        <select class="animelist-search-select-season" name="" id="" v-model="filterSeason"
+                            @change="handleYearChange" placeholder="選擇季節" v-show="pageType == 0">
+                            <option :value="i[0]" v-for="i in allSeason" :key="i">{{ i[1] }}</option>
+                        </select>
+                    </div>
+                </Transition>
             </div>
             <!-- 頂部功能區塊 -->
             <!-- 依年份季節搜尋動漫 -->
-            <Transition name="fade">
-                <div class="animelist-content" v-if="pageType == 0">
+            <transition name="fade">
+                <div class="animelist-content" v-if="pageType == 0 && data.length !== 0" id="animelist-content">
                     <div class="animelist-content-title">{{ filterYear }}年{{ seasonChinese }}總共{{
-                    data.length
-                }}部
+                data.length
+            }}部
                     </div>
                     <div class="animelist-content-group">
                         <div :class="{ 'animelist-content-item': true }" v-for="(item, i) in data" :key="i">
-                            <div class="animelist-content-item-img">
-                                <img v-if="item.images.facebook.og_image_url" :src="item.images.facebook.og_image_url"
-                                    alt="" srcset="">
-                                <div class="animelist-content-item-img-favorite"
-                                    v-if="userState && !checkAnimeInFavoriteList(userUid, item.id)"
-                                    @click="addFavorite(userUid, item.id)">未加入最愛</div>
-                                <div class="animelist-content-item-img-favorite"
-                                    v-if="userState && checkAnimeInFavoriteList(userUid, item.id)"
-                                    @click="cancelFavoriteAnime(item.id)">已加入最愛</div>
+                            <div class="animelist-content-item-title">
+                                <div class="animelist-content-item-title-name">{{ item.title }}
+                                </div>
                             </div>
-
                             <div class="animelist-content-item-description">
-                                <div class="animelist-content-item-description-title">
-                                    <div class="animelist-content-item-description-title-name">{{ item.title }}
-                                    </div>
+                                <div class="animelist-content-item-description-img">
+                                    <img v-if="item.images.facebook.og_image_url"
+                                        :src="item.images.facebook.og_image_url" alt="" srcset="">
+                                    <div class="animelist-content-item-description-img-favorite"
+                                        v-if="userState && !checkAnimeInFavoriteList(userUid, item.id)"
+                                        @click="addFavorite(userUid, item.id)">未加入最愛</div>
+                                    <div :class="{ 'animelist-content-item-description-img-favorite': true, 'addred': true }"
+                                        v-if="userState && checkAnimeInFavoriteList(userUid, item.id)"
+                                        @click="cancelFavoriteAnime(item.id)">已加入最愛</div>
                                 </div>
                                 <div class="animelist-content-item-description-data">
                                     <div class="animelist-content-item-description-data-mediatext">類型:{{ item.media_text
                                         }}
                                     </div>
-                                    <div class="animelist-content-item-description-data-officialsiteurl">官網:{{
-                    item.official_site_url }}</div>
-                                    <div class="animelist-content-item-description-data-seasonnametext">季度:{{
-                    item.season_name_text }}</div>
-                                    <div class="animelist-content-item-description-data-staffslist">
-                                        <div class="animelist-content-item-description-data-staffslist-title">製作組:</div>
-                                        <div class="animelist-content-item-description-data-staffslist-des"
-                                            v-for="(i, index) in item.staffs" :key="index">
-                                            <div>{{ i.role_other ? i.role_other : i.role_text }}</div>
-                                            <div> : </div>
-                                            <div>{{ i.name }}</div>
-                                        </div>
-                                        <div></div>
-                                    </div>
+                                    <div class="animelist-content-item-description-data-officialsiteurl">
+                                        官網:{{ item.official_site_url }}</div>
+                                    <div class="animelist-content-item-description-data-seasonnametext">
+                                        季度:{{ item.season_name_text }}</div>
                                 </div>
-                                <br />
-                                <div>ID: {{ item.id }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </Transition>
+            </transition>
             <!-- 依年份季節搜尋動漫 -->
             <!-- 依動漫名搜尋動漫 -->
-            <Transition name="fade">
-                <div class="animelist-content2" v-if="pageType == 1">
-                    <div class="animelist-content2-title">有關{{ animeTitleSave }}的搜尋結果，共{{ searchTypeAnimelist.length }}部
+            <transition name="fade">
+                <div class="animelist-content" v-if="pageType == 1 && animeTitle.length !== 0" id="animelist-content2">
+                    <div class="animelist-content-title">有關{{ animeTitleSave }}的搜尋結果，共{{
+                searchTypeAnimelist.length }}部
                     </div>
-                    <div class="animelist-content2-group">
-                        <div class="animelist-content2-item" v-for="(item, i) in searchTypeAnimelist" :key="i">
-                            <div class="animelist-content2-item-img">
-                                <img v-if="item.images.facebook.og_image_url" :src="item.images.facebook.og_image_url"
-                                    alt="無此圖片" srcset="">
-                                <div class="animelist-content2-item-img-favorite"
-                                    v-if="userState && !checkAnimeInFavoriteList(userUid, item.id)"
-                                    @click="addFavorite(userUid, item.id)">未加入最愛</div>
-                                <div class="animelist-content2-item-img-favorite"
-                                    v-if="userState && checkAnimeInFavoriteList(userUid, item.id)"
-                                    @click="cancelFavoriteAnime(item.id)">已加入最愛</div>
-                            </div>
-                            <div class="animelist-content2-item-description">
-                                <div class="animelist-content2-item-description-title">
-                                    <div class="animelist-content2-item-description-title-name">{{ i + 1 }}.{{
-                    item.title }}
-                                    </div>
+                    <div class="animelist-content-group">
+                        <div :class="{ 'animelist-content-item': true }" v-for="(item, i) in searchTypeAnimelist"
+                            :key="i">
+                            <div class="animelist-content-item-title">
+                                <div class="animelist-content-item-title-name">{{ item.title }}
                                 </div>
-                                <div class="animelist-content2-item-description-data">
-                                    <div class="animelist-content2-item-description-data-mediatext">類型:{{
-                    item.media_text }}
+                            </div>
+                            <div class="animelist-content-item-description">
+                                <div class="animelist-content-item-description-img">
+                                    <img v-if="item.images.facebook.og_image_url"
+                                        :src="item.images.facebook.og_image_url" alt="" srcset="">
+                                    <div class="animelist-content-item-description-img-favorite"
+                                        v-if="userState && !checkAnimeInFavoriteList(userUid, item.id)"
+                                        @click="addFavorite(userUid, item.id)">未加入最愛</div>
+                                    <div :class="{ 'animelist-content-item-description-img-favorite': true, 'addred': true }"
+                                        v-if="userState && checkAnimeInFavoriteList(userUid, item.id)"
+                                        @click="cancelFavoriteAnime(item.id)">已加入最愛</div>
+                                </div>
+                                <div class="animelist-content-item-description-data">
+                                    <div class="animelist-content-item-description-data-mediatext">類型:{{
+                item.media_text }}
                                     </div>
-                                    <div class="animelist-content2-item-description-data-officialsiteurl">官網:
-                                        {{ item.official_site_url }}</div>
-                                    <div class="animelist-content2-item-description-data-seasonnametext">季度:
-                                        {{ item.season_name_text }}</div>
-                                    <div class="animelist-content2-item-description-data-staffslist">
-                                        <div class="animelist-content2-item-description-data-staffslist-title">製作組:
-                                        </div>
-                                        <div class="animelist-content2-item-description-data-staffslist-des">
-                                            <div>職位</div>
-                                            <div> : </div>
-                                            <div>名字</div>
-                                        </div>
-                                        <div></div>
-                                    </div>
+                                    <div class="animelist-content-item-description-data-officialsiteurl">
+                                        官網:{{ item.official_site_url }}</div>
+                                    <div class="animelist-content-item-description-data-seasonnametext">
+                                        季度:{{ item.season_name_text }}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </Transition>
+            </transition>
             <!-- 依動漫名搜尋動漫 -->
             <!-- 我的最愛列表 -->
-            <Transition name="fade">
-                <div class="animelist-favoritelist" v-if="pageType == 2">
+            <transition name="fade">
+                <div class="animelist-favoritelist" v-if="pageType == 2 && loginUserFavoriteList.length !== 0">
                     <div class="animelist-favoritelist-content">
                         <ul class="favoritelist-group">
                             <li class="favoritelist-item" v-for="(item, index) in loginUserFavoriteList" :key="index">
-                                <div class="favoritelist-item-title">
-                                    {{ item.title }}
+                                <div class="favoritelist-item-top">
+                                    <div class="favoritelist-item-top-title">
+                                        {{ item.title }}
+                                    </div>
+                                    <button class="favoritelist-item-top-button" @click="deleteFavoritelistItem(item.id)">移除</button>
                                 </div>
+
+                                <div class="favoritelist-item-description">資訊</div>
                             </li>
                         </ul>
                     </div>
                 </div>
-            </Transition>
+            </transition>
             <!-- 我的最愛列表 -->
             <!-- 使用者登入 -->
             <div class="user-box" v-if="loginBox">
@@ -542,8 +539,12 @@ const getFavoriteList = () => {
                 <div class="user-about-box">
                     <div class="user-about-box-content">
                         <div class="user-about-box-content-userinfo">
-                            <div class="user-about-box-content-userinfo-icon">使用者頭像</div>
-                            <div class="user-about-box-content-userinfo-uid">USERID : {{ userUid }}</div>
+                            <div class="user-about-box-content-userinfo-icon">ICON</div>
+                            <div class="user-about-box-content-userinfo-uid">USERID : {{ userUid }}
+                                <div class="user-about-box-content-userinfo-name">
+                                    {{ }}
+                                </div>
+                            </div>
                         </div>
                         <div class="user-about-box-content-check" @click="userInfoBox = false">
                             退出
@@ -567,31 +568,31 @@ const getFavoriteList = () => {
     // scroll-behavior: smooth;
 
     .container {
-        position: relative;
-        width: 1200px;
+        max-width: 1200px;
         box-sizing: border-box;
         background-color: white;
         box-shadow: 0 0 5px gray;
+        position: relative;
 
         .animelist-search {
+            background-color: white;
             border-bottom: 1px solid black;
             display: flex;
-            justify-content: space-evenly;
+            justify-content: center;
             align-items: center;
-            height: 100px;
-            width: 100%;
+            flex-wrap: wrap;
             box-sizing: border-box;
 
             .animelist-search-switch {
                 width: 100%;
+                height: 100px;
                 display: flex;
                 justify-content: space-evenly;
                 align-items: center;
-                box-shadow: 0 0 5px gray;
-                border-radius: 30px;
-                padding: 10px;
-                margin: 0 20px;
+                border-bottom: 1px solid black;
                 box-sizing: border-box;
+                font-size: 25px;
+                font-weight: bolder;
 
                 .animelist-search-switch-year {
                     display: flex;
@@ -599,18 +600,19 @@ const getFavoriteList = () => {
                     align-items: center;
                     width: 100%;
                     cursor: pointer;
+                    // background-color: aliceblue;
+                    height: 100%;
+                    // border-right: 1px solid black;
+                    box-sizing: border-box;
+                    padding: 20px;
+
+                    &:hover {
+                        background-color: lightgray;
+                        color: white;
+                        font-size: 25px;
+                        font-weight: bolder;
+                    }
                 }
-
-                // .animelist-search-switch-year::after {
-                //     content: '';
-                //     display: block;
-                //     width: 0px;
-                //     height: 2px;
-                //     background-color: black;
-                //     transition: all 0.2s linear;
-                // }
-
-
 
                 .animelist-search-switch-name {
                     display: flex;
@@ -618,32 +620,91 @@ const getFavoriteList = () => {
                     align-items: center;
                     width: 100%;
                     cursor: pointer;
+                    // background-color: aliceblue;
+                    height: 100%;
+                    // border-right: 1px solid black;
+                    padding: 20px;
+                    box-sizing: border-box;
+
+                    &:hover {
+                        background-color: lightgray;
+                        color: white;
+                        font-size: 25px;
+                        font-weight: bolder;
+                    }
+                }
+
+                .animelist-search-switch-favorite {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 100%;
+                    cursor: pointer;
+                    // background-color: aliceblue;
+                    height: 100%;
+                    // border-right: 1px solid black;
+                    box-sizing: border-box;
+                    padding: 20px;
+
+                    &:hover {
+                        background-color: lightgray;
+                        color: white;
+                        font-size: 25px;
+                        font-weight: bolder;
+                    }
                 }
             }
 
             .animelist-search-select-bar {
                 display: flex;
                 justify-content: space-evenly;
+                align-items: center;
                 width: 100%;
+                height: 100px;
+                box-sizing: border-box;
 
                 .animelist-search-input {
                     padding: 10px;
-                    font-size: 20px;
+                    width: 100%;
+                    height: 100%;
+                    box-sizing: border-box;
+                    font-size: 30px;
                     text-align: center;
-                    border-radius: 30px;
-                    box-shadow: 0 0 5px gray;
+                    // border-radius: 30px;
+                    // box-shadow: 0 0 5px gray;
                     color: lightgray;
                     border: none;
-                    transition: all 0.2s linear;
+                    transition: all 0.25s ease-in-out;
 
                     &:focus {
                         color: black;
                         outline: none;
-                        box-shadow: 0 0 3px black;
+                        font-size: 40px;
                     }
 
                     &:hover {
                         cursor: pointer;
+                    }
+                }
+
+                select {
+                    font-size: 20px;
+                    text-align: center;
+                    border: none;
+                    width: 100%;
+                    height: 100px;
+                    box-sizing: border-box;
+
+                    &:focus {
+                        outline: none;
+                    }
+
+                    &:hover {
+                        cursor: pointer;
+                    }
+
+                    option {
+                        text-align: center;
                     }
                 }
             }
@@ -652,157 +713,171 @@ const getFavoriteList = () => {
         }
 
         .animelist-content {
+            width: 100%;
             box-sizing: border-box;
 
             .animelist-content-title {
                 font-size: 30px;
                 text-align: center;
-                height: 50px;
                 line-height: 50px;
+                width: 100%;
             }
 
             .animelist-content-item {
-                display: flex;
-                border-top: 1px solid black;
+                width: 100%;
+                padding: 0 20px 20px;
                 box-sizing: border-box;
 
-                .animelist-content-item-img {
-                    min-width: 571px;
-                    height: 300px;
-                    background-color: aquamarine;
+                .animelist-content-item-title {
+                    width: 100%;
+                    font-size: clamp(16px, 3vw, 25px);
                     display: flex;
                     justify-content: center;
-                    position: relative;
-
-                    img {
-                        height: 300px;
-                        object-fit: contain;
-                    }
-
-                    .animelist-content-item-img-favorite {
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        background-color: aliceblue;
-                        width: 50px;
-                        height: 50px;
-
-                        &:hover {
-                            cursor: pointer;
-                            border: 1px solid black;
-                            background-color: white;
-                            box-sizing: border-box;
-                        }
-                    }
+                    align-items: center;
+                    box-sizing: border-box;
+                    background-color: black;
+                    color: white;
+                    padding: 10px;
+                    box-shadow: 0 0 5px black;
+                    border-top-left-radius: 15px;
+                    border-top-right-radius: 15px;
+                    border: 1px solid black;
                 }
 
                 .animelist-content-item-description {
-                    padding: 10px;
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    // border: 1px solid black;
                     box-sizing: border-box;
-                    border-left: 1px solid black;
-
-                    .animelist-content-item-description-title {
-                        .animelist-content-item-description-title-name {
-                            font-size: 30px;
-                            box-shadow: 0 0 3px gray;
-                            border-radius: 5px;
-                        }
-                    }
+                    position: relative;
+                    border-bottom-left-radius: 15px;
+                    border-bottom-right-radius: 15px;
+                    box-shadow: 0 0 5px black;
 
                     .animelist-content-item-description-data {
-                        .animelist-content-item-description-data-staffslist {
-                            .animelist-content-item-description-data-staffslist-des {
-                                display: flex;
-                                font-size: 20px;
+                        width: 100%;
+                        padding: 10px;
+                        font-size: clamp(16px, 3vw, 20px);
+                        box-sizing: border-box;
+                        display: flex;
+                        justify-content: space-evenly;
+                        align-items: center;
 
-                                div {
-                                    margin: 0 10px;
-                                }
-                            }
+                        // flex-wrap: wrap;
+                        .animelist-content-item-description-data-mediatext,
+                        .animelist-content-item-description-data-officialsiteurl,
+                        .animelist-content-item-description-data-seasonnametext {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            width: 100%;
+                            flex-wrap: wrap;
+                            // box-sizing: border-box;
+                            overflow: auto;
                         }
-                    }
-                }
-            }
-        }
 
-        .animelist-content2 {
-            box-sizing: border-box;
-
-            .animelist-content2-title {
-                font-size: 30px;
-                text-align: center;
-                height: 50px;
-                line-height: 50px;
-            }
-
-            .animelist-content2-item {
-                display: flex;
-                border-top: 1px solid black;
-                box-sizing: border-box;
-
-                .animelist-content2-item-img {
-                    min-width: 571px;
-                    height: 300px;
-                    background-color: aquamarine;
-                    display: flex;
-                    justify-content: center;
-                    position: relative;
-
-                    img {
-                        height: 300px;
-                        object-fit: contain;
                     }
 
-                    .animelist-content2-item-img-favorite {
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        background-color: aliceblue;
-                        width: 50px;
-                        height: 50px;
+                    .animelist-content-item-description-img {
+                        min-height: 100px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        box-sizing: border-box;
 
-                        &:hover {
-                            cursor: pointer;
-                            border: 1px solid black;
-                            background-color: white;
+                        img {
+                            width: 100%;
                             box-sizing: border-box;
                         }
-                    }
-                }
 
-                .animelist-content2-item-description {
-                    padding: 10px;
-                    box-sizing: border-box;
-                    border-left: 1px solid black;
+                        .animelist-content-item-description-img-favorite {
+                            position: absolute;
+                            top: 20px;
+                            right: 20px;
+                            background-color: white;
+                            width: 100px;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            height: 50px;
+                            box-sizing: border-box;
+                            transition: all 0.2s linear;
+                            color: red;
+                            font-weight: bold;
+                            border-radius: 25px;
+                            border: 1px solid red;
 
-                    .animelist-content2-item-description-title {
-                        .animelist-content2-item-description-title-name {
-                            font-size: 30px;
-                            box-shadow: 0 0 3px gray;
-                            border-radius: 5px;
-                        }
-                    }
+                            &:hover {
+                                cursor: pointer;
+                                background-color: red;
+                                box-sizing: border-box;
+                                color: white;
+                                font-weight: bold;
+                            }
 
-                    .animelist-content2-item-description-data {
-                        .animelist-content2-item-description-data-staffslist {
-                            .animelist-content2-item-description-data-staffslist-des {
-                                display: flex;
-                                font-size: 20px;
-
-                                div {
-                                    margin: 0 10px;
-                                }
+                            &:active {
+                                scale: 0.95;
                             }
                         }
                     }
+                }
+
+                &:last-child {
+                    margin-bottom: 50px;
                 }
             }
         }
 
         .animelist-favoritelist {
+            box-sizing: border-box;
+
             .animelist-favoritelist-content {
                 .favoritelist-group {
                     list-style: none;
+                    box-sizing: border-box;
+
+                    .favoritelist-item {
+                        height: 100%;
+                        border-bottom: 1px solid black;
+                        padding: 10px;
+                        box-sizing: border-box;
+                        &:last-child {
+                            margin-bottom: 50px;
+                            border: none;
+                        }
+                        .favoritelist-item-top {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            .favoritelist-item-top-title {
+                                width: 80%;
+                                font-size: 20px;
+                            }
+                            .favoritelist-item-top-button {
+                                padding: 10px;
+                                font-size: 16px;
+                                font-weight: bold;
+                                background-color: red;
+                                color: white;
+                                border-radius: 10px;
+                                text-align: center;
+                                cursor: pointer;
+                                border: 1px solid transparent;
+                                transition: all 0.2s ease-out;
+                                &:hover {
+                                    border: 1px solid red;
+                                    background-color: white;
+                                    color: red;
+                                }
+                                &:active {
+                                    scale: 0.95;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -823,7 +898,7 @@ const getFavoriteList = () => {
                 width: 400px;
                 height: 400px;
                 background-color: white;
-                border-radius: 50px;
+                border-radius: 10px;
 
                 .user-box-login-content {
                     padding: 30px;
@@ -842,7 +917,8 @@ const getFavoriteList = () => {
                         text-align: center;
                         cursor: pointer;
                         border: 1px solid transparent;
-                        transition: all 0.2s linear;
+                        font-weight: bold;
+                        transition: all 0.2s ease-out;
 
                         &:hover {
                             background-color: white;
@@ -854,7 +930,6 @@ const getFavoriteList = () => {
 
                         &:active {
                             scale: 0.95;
-                            font-weight: bold;
                         }
                     }
 
@@ -874,6 +949,23 @@ const getFavoriteList = () => {
                         width: 30%;
                         margin: 0 auto;
                         text-align: center;
+                        border-radius: 10px;
+                        border: 1px solid transparent;
+                        box-sizing: border-box;
+                        font-weight: bold;
+                        transition: all 0.2s ease-out;
+
+                        &:hover {
+                            cursor: pointer;
+                            border: 1px solid black;
+                            box-sizing: border-box;
+                            background-color: black;
+                            color: white;
+                        }
+
+                        &:active {
+                            scale: 0.95;
+                        }
                     }
                 }
 
@@ -892,7 +984,7 @@ const getFavoriteList = () => {
             .user-logoutmsg-content {
                 width: 300px;
                 height: 300px;
-                background-color: aqua;
+                background-color: white;
                 position: absolute;
                 top: 50%;
                 left: 50%;
@@ -902,6 +994,9 @@ const getFavoriteList = () => {
                 flex-direction: column;
                 justify-content: space-evenly;
                 font-size: 30px;
+                border-radius: 10px;
+                padding: 20px;
+                font-weight: bold;
 
                 .user-logoutmsg-content-checkbutton {
                     display: flex;
@@ -913,41 +1008,60 @@ const getFavoriteList = () => {
                         width: 30%;
                         margin: 0 auto;
                         text-align: center;
+                        border-radius: 10px;
+                        border: 1px solid transparent;
+                        box-sizing: border-box;
+                        font-weight: bold;
+                        transition: all 0.2s ease-out;
+
+                        &:hover {
+                            cursor: pointer;
+                            border: 1px solid black;
+                            box-sizing: border-box;
+                            background-color: black;
+                            color: white;
+                        }
+
+                        &:active {
+                            scale: 0.95;
+                        }
                     }
                 }
             }
         }
 
         .animelist-sidetoolbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
 
+            // background-color: antiquewhite;
             .animelist-sidetoolbar-box {
-                position: absolute;
-                top: 150px;
-                right: 15%;
+                // background-color: aqua;
+                position: fixed;
+                display: flex;
 
                 .animelist-sidetoolbar-item {
                     background-color: white;
                     // backdrop-filter: blur(5px);
-                    position: fixed;
                     width: 50px;
                     height: 50px;
-                    border: 1px solid black;
-                    margin: 5px 0;
+                    // border: 1px solid black;
+                    box-shadow: 0 0 5px gray;
+                    margin: 5px;
                     font-size: 18px;
                     text-align: center;
                     display: flex;
                     justify-content: center;
                     align-items: center;
                     transition: all 0.2s linear;
+                    padding: 5px;
 
+                    // border-radius: 50px;
+                    // box-sizing: border-box;
                     &:hover {
                         cursor: pointer;
                         background-color: lightgray;
                         color: white;
+                        // border: 1px solid transparent;
+                        box-shadow: 0 0 5px gray;
                     }
 
                     &:active {
@@ -960,19 +1074,19 @@ const getFavoriteList = () => {
                 .sidetoolbar-nowuser-item {}
 
                 .sidetoolbar-favorite-item {
-                    top: 210px;
+                    // top: 210px;
                 }
 
                 .sidetoolbar-backhome-item {
-                    top: 210px;
+                    // top: 210px;
                 }
 
                 .sidetoolbar-logout-item {
-                    top: 270px;
+                    // top: 270px;
                 }
 
                 .sidetoolbar-backtop-item {
-                    top: 330px;
+                    // top: 330px;
                 }
 
             }
@@ -1010,7 +1124,7 @@ const getFavoriteList = () => {
                     height: 100%;
 
                     .user-about-box-content-userinfo {
-                        // background-color: aqua;
+                        background-color: aliceblue;
                         width: 100%;
                         height: 50%;
                         display: flex;
@@ -1023,11 +1137,14 @@ const getFavoriteList = () => {
                         .user-about-box-content-userinfo-icon {
                             width: 80px;
                             height: 80px;
-                            background-color: blueviolet;
                             border-radius: 40px;
                             display: flex;
                             justify-content: center;
                             align-items: center;
+                            border: 1px black solid;
+                            box-sizing: border-box;
+                            background-color: white;
+
                         }
 
                         .user-about-box-content-userinfo-uid {
@@ -1035,31 +1152,38 @@ const getFavoriteList = () => {
                             font-weight: bold;
                             text-align: center;
                         }
+
+                        .user-about-box-content-userinfo-name {
+                            font-size: 20px;
+                            font-weight: bold;
+                            text-align: center;
+                        }
                     }
 
                     .user-about-box-content-check {
-                        background-color: aquamarine;
+                        background-color: red;
                         width: 50%;
-                        height: 50px;
                         text-align: center;
-                        line-height: 50px;
-                        border-radius: 5px;
-                        transition: all .2s linear;
+                        border-radius: 10px;
+                        font-weight: bold;
+                        box-sizing: border-box;
+                        color: white;
+                        border: 1px solid transparent;
+                        font-size: 20px;
+                        padding: 10px;
+                        cursor: pointer;
+                        transition: all 0.2s ease-out;
 
                         &:hover {
                             cursor: pointer;
                             background-color: white;
-                            border: 1px solid aquamarine;
-                            color: aquamarine;
+                            color: red;
+                            border: 1px solid red;
                             box-sizing: border-box;
                         }
 
                         &:active {
                             scale: 0.95;
-                            background-color: aquamarine;
-                            border: 1px solid transparent;
-                            color: black;
-                            box-sizing: border-box;
                         }
                     }
                 }
@@ -1068,9 +1192,10 @@ const getFavoriteList = () => {
     }
 }
 
+
 .fade-enter-active,
 .fade-leave-active {
-    transition: opacity 0.5s ease-out;
+    transition: opacity 0.5s ease-in-out;
 }
 
 .fade-enter-from,
@@ -1078,16 +1203,81 @@ const getFavoriteList = () => {
     opacity: 0;
 }
 
-.reloading {
-    transform: scale(1.1);
-    transition: all 0.5s ease;
-}
-
 
 .highlight {
-    color: red;
-    transform: scale(1.1);
+    color: white;
+    font-size: 25px;
     font-weight: bolder;
-    transition: all 0.1s ease-in;
+    transition: all 0.2s ease-in;
+    background-color: black;
+}
+
+.addred {
+    box-shadow: 0 0 10px red;
+    color: red;
+    border: 1px solid transparent !important;
+}
+
+.cancelborderbottom {
+    border: none !important;
+}
+
+@media (min-width: 1200px) {
+
+    .container {
+        width: 100%;
+    }
+
+
+}
+
+@media (max-width: 1200px) {
+    .container {
+        width: 100%;
+    }
+}
+
+@media (min-width: 425px) {
+    .container {
+        .animelist-sidetoolbar {
+            .animelist-sidetoolbar-box {
+                flex-direction: column;
+                bottom: 5%;
+                right: 5%;
+            }
+        }
+    }
+}
+
+@media (max-width: 1500px) {
+    .container {
+        .animelist-content-item-description-data {
+            flex-direction: column;
+        }
+
+        .animelist-sidetoolbar {
+            background-color: antiquewhite !important;
+
+            .animelist-sidetoolbar-box {
+                width: 100%;
+                flex-direction: row;
+                bottom: 0;
+                left: 0;
+
+
+                .animelist-sidetoolbar-item {
+                    margin: 0 !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+
+                    &:active {
+                        scale: 1 !important;
+                        background-color: gray;
+                        color: white;
+                    }
+                }
+            }
+        }
+    }
 }
 </style>
