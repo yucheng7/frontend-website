@@ -1214,7 +1214,7 @@ const deleteFavoritelistItem = (animeid) => {
 
 .addred {
     box-shadow: 0 0 10px red;
-    color: red;
+    color: red !important;
     border: 1px solid transparent !important;
 }
 
