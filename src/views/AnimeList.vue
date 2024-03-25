@@ -478,7 +478,8 @@ const deleteFavoritelistItem = (animeid) => {
                                     <div class="favoritelist-item-top-title">
                                         {{ item.title }}
                                     </div>
-                                    <button class="favoritelist-item-top-button" @click="deleteFavoritelistItem(item.id)">移除</button>
+                                    <button class="favoritelist-item-top-button"
+                                        @click="deleteFavoritelistItem(item.id)">移除</button>
                                 </div>
 
                                 <div class="favoritelist-item-description">資訊</div>
@@ -489,6 +490,7 @@ const deleteFavoritelistItem = (animeid) => {
             </transition>
             <!-- 我的最愛列表 -->
             <!-- 使用者登入 -->
+            <Transition name="quick">
             <div class="user-box" v-if="loginBox">
                 <div class="user-box-login">
                     <div class="user-box-login-content">
@@ -502,8 +504,10 @@ const deleteFavoritelistItem = (animeid) => {
                     </div>
                 </div>
             </div>
+            </Transition>
             <!-- 使用者登入 -->
             <!-- 使用者登出 -->
+            <Transition name="quick">
             <div class="user-logoutmsg" v-if="logoutBox">
                 <div class="user-logoutmsg-content">
                     <div>是否確定要登出?</div>
@@ -513,8 +517,10 @@ const deleteFavoritelistItem = (animeid) => {
                     </div>
                 </div>
             </div>
+            </Transition>
             <!-- 使用者登出 -->
             <!-- 側邊懸浮工具列 -->
+            <Transition name="quick">
             <div class="animelist-sidetoolbar" v-if="sideToolShow">
                 <div class="animelist-sidetoolbar-box">
                     <div class="animelist-sidetoolbar-item sidetoolbar-login-item"
@@ -533,8 +539,10 @@ const deleteFavoritelistItem = (animeid) => {
                     <div class="animelist-sidetoolbar-item sidetoolbar-backtop-item" @click="backToTop">返回頂端</div>
                 </div>
             </div>
+            </Transition>
             <!-- 側邊懸浮工具列 -->
             <!-- 使用者資訊視窗 -->
+            <Transition name="quick">
             <div class="user-about" v-if="userState && userInfoBox">
                 <div class="user-about-box">
                     <div class="user-about-box-content">
@@ -542,7 +550,6 @@ const deleteFavoritelistItem = (animeid) => {
                             <div class="user-about-box-content-userinfo-icon">ICON</div>
                             <div class="user-about-box-content-userinfo-uid">USERID : {{ userUid }}
                                 <div class="user-about-box-content-userinfo-name">
-                                    {{ }}
                                 </div>
                             </div>
                         </div>
@@ -552,6 +559,7 @@ const deleteFavoritelistItem = (animeid) => {
                     </div>
                 </div>
             </div>
+            </Transition>
             <!-- 使用者資訊視窗 -->
 
         </div>
@@ -844,18 +852,22 @@ const deleteFavoritelistItem = (animeid) => {
                         border-bottom: 1px solid black;
                         padding: 10px;
                         box-sizing: border-box;
+
                         &:last-child {
                             margin-bottom: 50px;
                             border: none;
                         }
+
                         .favoritelist-item-top {
                             display: flex;
                             justify-content: space-between;
                             align-items: center;
+
                             .favoritelist-item-top-title {
                                 width: 80%;
                                 font-size: 20px;
                             }
+
                             .favoritelist-item-top-button {
                                 padding: 10px;
                                 font-size: 16px;
@@ -867,11 +879,13 @@ const deleteFavoritelistItem = (animeid) => {
                                 cursor: pointer;
                                 border: 1px solid transparent;
                                 transition: all 0.2s ease-out;
+
                                 &:hover {
                                     border: 1px solid red;
                                     background-color: white;
                                     color: red;
                                 }
+
                                 &:active {
                                     scale: 0.95;
                                 }
@@ -1133,6 +1147,7 @@ const deleteFavoritelistItem = (animeid) => {
                         border: 1px black solid;
                         box-sizing: border-box;
                         border-radius: 5px;
+                        flex-wrap: wrap;
 
                         .user-about-box-content-userinfo-icon {
                             width: 80px;
@@ -1148,16 +1163,20 @@ const deleteFavoritelistItem = (animeid) => {
                         }
 
                         .user-about-box-content-userinfo-uid {
-                            font-size: 20px;
+                            font-size: 16px;
                             font-weight: bold;
                             text-align: center;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            flex-wrap: wrap;
                         }
 
-                        .user-about-box-content-userinfo-name {
-                            font-size: 20px;
-                            font-weight: bold;
-                            text-align: center;
-                        }
+                        // .user-about-box-content-userinfo-name {
+                        //     font-size: 20px;
+                        //     font-weight: bold;
+                        //     text-align: center;
+                        // }
                     }
 
                     .user-about-box-content-check {
@@ -1203,6 +1222,15 @@ const deleteFavoritelistItem = (animeid) => {
     opacity: 0;
 }
 
+.quick-enter-active,
+.quick-leave-active {
+    transition: opacity 0.15s ease-in-out;
+}
+
+.quick-enter-from,
+.quick-leave-to {
+    opacity: 0;
+}
 
 .highlight {
     color: white;
@@ -1244,6 +1272,32 @@ const deleteFavoritelistItem = (animeid) => {
                 flex-direction: column;
                 bottom: 5%;
                 right: 5%;
+            }
+        }
+    }
+}
+
+@media (max-width: 425px) {
+    .container {
+        .user-box {
+            .user-box-login {
+                width: 90% !important;
+            }
+        }
+
+        .user-logoutmsg {
+            .user-logoutmsg-content {
+                width: 80% !important;
+            }
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        .user-about {
+            .user-about-box {
+                width: 90% !important;
             }
         }
     }
