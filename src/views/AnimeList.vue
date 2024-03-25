@@ -783,6 +783,7 @@ const deleteFavoritelistItem = (animeid) => {
                             align-items: center;
                             width: 100%;
                             flex-wrap: wrap;
+                            flex-direction: column;
                             // box-sizing: border-box;
                             overflow: auto;
                         }
