@@ -5,9 +5,9 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
-      name: 'aboutme',
-      component: () => import('../views/AboutMe.vue')
+      // path: '/',
+      // name: 'aboutme',
+      // component: () => import('../views/AboutMe.vue')
     },
     {
       path: '/twitterclone',
@@ -15,7 +15,7 @@ const router = createRouter({
       component: () => import('../views/TwitterClone.vue')
     },
     {
-      path: '/animelist',
+      path: '/',
       name: 'animelist',
       // meta: {
       //   keepAlive: false
