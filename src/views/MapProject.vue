@@ -3,10 +3,25 @@ import { ref } from 'vue'
 import axios from 'axios'
 
 const response = ref('')
+const responseobject = ref('')
+
+const getGeolocation = async () => {
+    try {
+        const res = await axios.post("https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c")
+        console.log(res.data)
+        response.value = res.data
+        responseobject.value = JSON.stringify(res.data)
+        
+    } catch (error) {
+        console.log('發生錯誤', error)
+    }
+
+}
 
 </script>
 
 <template>
+    <!-- 金鑰 AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c -->
     <div class="map">
         <div class="map-content">
             <div class="map-item"></div>
@@ -15,7 +30,8 @@ const response = ref('')
             <div class="map-function-item">
                 <div class="map-function-item-response">
                     <input type="text" value="" v-model="response">
-                    <button>點擊獲取</button>
+                    <textarea name="" id="" cols="30" rows="10" v-model="responseobject"></textarea>
+                    <button @click="getGeolocation">點擊獲取</button>
                 </div>
             </div>
         </div>
@@ -53,13 +69,15 @@ const response = ref('')
 
         .map-function-item {
             width: 500px;
-            height: 500px;
+            min-height: 500px;
             background-color: cornflowerblue;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
+
             .map-function-item-response {
-                input {
+                input, textarea {
                     display: block;
                     width: 100%;
                     padding: 10px;
