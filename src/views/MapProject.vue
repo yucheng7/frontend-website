@@ -11,17 +11,26 @@ const getGeolocation = async () => {
         console.log(res.data)
         response.value = res.data
         responseobject.value = JSON.stringify(res.data)
-        
+
     } catch (error) {
         console.log('發生錯誤', error)
     }
 
 }
 
-const getUserLocation = async() => {
-    if(navigator.geolocation){
+const getUserLocation = () => {
+    if (navigator.geolocation) {
         alert('可以取得位置');
-    }else{
+        navigator.geolocation.getCurrentPosition((position) => {
+            
+            let object = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+            }
+            responseobject.value = JSON.stringify(object)
+            console.log("取得位置成功", responseobject.value);
+        })
+    } else {
         alert('無法取得位置');
     }
 }
@@ -85,7 +94,9 @@ const getUserLocation = async() => {
             padding: 20px;
 
             .map-function-item-response {
-                input, textarea {
+
+                input,
+                textarea {
                     display: block;
                     width: 100%;
                     padding: 10px;
