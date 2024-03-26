@@ -424,8 +424,10 @@ const deleteFavoritelistItem = (animeid) => {
                             </div>
                             <div class="animelist-content-item-description">
                                 <div class="animelist-content-item-description-img">
-                                    <img v-if="item.images.facebook.og_image_url"
-                                        :src="item.images.facebook.og_image_url" alt="" srcset="">
+                                    <a :href="item.images.facebook.og_image_url">
+                                        <img v-if="item.images.facebook.og_image_url"
+                                            :src="item.images.facebook.og_image_url" alt="" srcset="">
+                                    </a>
                                     <div class="animelist-content-item-description-img-favorite"
                                         v-if="userState && !checkAnimeInFavoriteList(userUid, item.id)"
                                         @click="addFavorite(userUid, item.id)">未加入最愛</div>
@@ -463,8 +465,10 @@ const deleteFavoritelistItem = (animeid) => {
                             </div>
                             <div class="animelist-content-item-description">
                                 <div class="animelist-content-item-description-img">
-                                    <img v-if="item.images.facebook.og_image_url"
-                                        :src="item.images.facebook.og_image_url" alt="" srcset="">
+                                    <a :href="item.images.facebook.og_image_url">
+                                        <img v-if="item.images.facebook.og_image_url"
+                                            :src="item.images.facebook.og_image_url" alt="" srcset="">
+                                    </a>
                                     <div class="animelist-content-item-description-img-favorite"
                                         v-if="userState && !checkAnimeInFavoriteList(userUid, item.id)"
                                         @click="addFavorite(userUid, item.id)">未加入最愛</div>
@@ -510,74 +514,74 @@ const deleteFavoritelistItem = (animeid) => {
             <!-- 我的最愛列表 -->
             <!-- 使用者登入 -->
             <Transition name="quick">
-            <div class="user-box" v-if="loginBox">
-                <div class="user-box-login">
-                    <div class="user-box-login-content">
-                        <div class="user-box-login-content-out" @click="loginBox = false, sideToolShow = true">退出
+                <div class="user-box" v-if="loginBox">
+                    <div class="user-box-login">
+                        <div class="user-box-login-content">
+                            <div class="user-box-login-content-out" @click="loginBox = false, sideToolShow = true">退出
+                            </div>
+                            <input type="text" class="user-box-login-content-username" value="" v-model="userEmail"
+                                placeholder="使用者帳號">
+                            <input type="password" class="user-box-login-content-password" value=""
+                                v-model="userPassword" placeholder="使用者密碼">
+                            <button class="user-box-login-content-loginbtn" @click="userLogin">登入</button>
                         </div>
-                        <input type="text" class="user-box-login-content-username" value="" v-model="userEmail"
-                            placeholder="使用者帳號">
-                        <input type="password" class="user-box-login-content-password" value="" v-model="userPassword"
-                            placeholder="使用者密碼">
-                        <button class="user-box-login-content-loginbtn" @click="userLogin">登入</button>
                     </div>
                 </div>
-            </div>
             </Transition>
             <!-- 使用者登入 -->
             <!-- 使用者登出 -->
             <Transition name="quick">
-            <div class="user-logoutmsg" v-if="logoutBox">
-                <div class="user-logoutmsg-content">
-                    <div>是否確定要登出?</div>
-                    <div class="user-logoutmsg-content-checkbutton">
-                        <button @click="userLogout">確定</button>
-                        <button @click="logoutBox = false, sideToolShow = true">取消</button>
+                <div class="user-logoutmsg" v-if="logoutBox">
+                    <div class="user-logoutmsg-content">
+                        <div>是否確定要登出?</div>
+                        <div class="user-logoutmsg-content-checkbutton">
+                            <button @click="userLogout">確定</button>
+                            <button @click="logoutBox = false, sideToolShow = true">取消</button>
+                        </div>
                     </div>
                 </div>
-            </div>
             </Transition>
             <!-- 使用者登出 -->
             <!-- 側邊懸浮工具列 -->
             <Transition name="quick">
-            <div class="animelist-sidetoolbar" v-if="sideToolShow">
-                <div class="animelist-sidetoolbar-box">
-                    <div class="animelist-sidetoolbar-item sidetoolbar-login-item"
-                        @click="loginBox = true, sideToolShow = false" v-if="!userState">登入</div>
-                    <div class="animelist-sidetoolbar-item sidetoolbar-nowuser-item" v-if="userState"
-                        @click="userInfoBox = true">目前user</div>
-                    <div class="animelist-sidetoolbar-item sidetoolbar-favorite-item"
-                        v-if="userState && pageType == 0 || userState && pageType == 1"
-                        @click="pageType = 2, getFavoriteList()">
-                        我的最愛
+                <div class="animelist-sidetoolbar" v-if="sideToolShow">
+                    <div class="animelist-sidetoolbar-box">
+                        <div class="animelist-sidetoolbar-item sidetoolbar-login-item"
+                            @click="loginBox = true, sideToolShow = false" v-if="!userState">登入</div>
+                        <div class="animelist-sidetoolbar-item sidetoolbar-nowuser-item" v-if="userState"
+                            @click="userInfoBox = true">目前user</div>
+                        <div class="animelist-sidetoolbar-item sidetoolbar-favorite-item"
+                            v-if="userState && pageType == 0 || userState && pageType == 1"
+                            @click="pageType = 2, getFavoriteList()">
+                            我的最愛
+                        </div>
+                        <div class="animelist-sidetoolbar-item sidetoolbar-backhome-item"
+                            v-if="userState && pageType == 2" @click="pageType = 0">返回首頁</div>
+                        <div class="animelist-sidetoolbar-item sidetoolbar-logout-item"
+                            @click="logoutBox = true, sideToolShow = false" v-if="userState">登出</div>
+                        <div class="animelist-sidetoolbar-item sidetoolbar-backtop-item" @click="backToTop">返回頂端</div>
                     </div>
-                    <div class="animelist-sidetoolbar-item sidetoolbar-backhome-item" v-if="userState && pageType == 2"
-                        @click="pageType = 0">返回首頁</div>
-                    <div class="animelist-sidetoolbar-item sidetoolbar-logout-item"
-                        @click="logoutBox = true, sideToolShow = false" v-if="userState">登出</div>
-                    <div class="animelist-sidetoolbar-item sidetoolbar-backtop-item" @click="backToTop">返回頂端</div>
                 </div>
-            </div>
             </Transition>
             <!-- 側邊懸浮工具列 -->
             <!-- 使用者資訊視窗 -->
             <Transition name="quick">
-            <div class="user-about" v-if="userState && userInfoBox">
-                <div class="user-about-box">
-                    <div class="user-about-box-content">
-                        <div class="user-about-box-content-userinfo">
-                            <div class="user-about-box-content-userinfo-icon">ICON</div>
-                            <div class="user-about-box-content-userinfo-uid">USERID : {{ userUid }}
-                                <div class="user-about-box-content-userinfo-name">
+                <div class="user-about" v-if="userState && userInfoBox">
+                    <div class="user-about-box">
+                        <div class="user-about-box-content">
+                            <div class="user-about-box-content-userinfo">
+                                <div class="user-about-box-content-userinfo-icon">ICON</div>
+                                <div class="user-about-box-content-userinfo-uid">USERID : {{ userUid }}
+                                    <div class="user-about-box-content-userinfo-name">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="user-about-box-content-check" @click="userInfoBox = false">
-                            退出
+                            <div class="user-about-box-content-check" @click="userInfoBox = false">
+                                退出
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
             </Transition>
             <!-- 使用者資訊視窗 -->
 
@@ -588,323 +592,263 @@ const deleteFavoritelistItem = (animeid) => {
 <style scoped lang="scss">
 @media (any-hover: hover) {
     .main {
-    background-color: aliceblue;
-    width: 100%;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    // scroll-behavior: smooth;
+        background-color: aliceblue;
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        // scroll-behavior: smooth;
 
-    .container {
-        max-width: 1200px;
-        box-sizing: border-box;
-        background-color: white;
-        box-shadow: 0 0 5px gray;
-        position: relative;
-
-        .animelist-search {
-            background-color: white;
-            border-bottom: 1px solid black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
+        .container {
+            max-width: 1200px;
             box-sizing: border-box;
+            background-color: white;
+            box-shadow: 0 0 5px gray;
+            position: relative;
 
-            .animelist-search-switch {
-                width: 100%;
-                height: 100px;
-                display: flex;
-                justify-content: space-evenly;
-                align-items: center;
+            .animelist-search {
+                background-color: white;
                 border-bottom: 1px solid black;
-                box-sizing: border-box;
-                font-size: 25px;
-                font-weight: bolder;
-
-                .animelist-search-switch-year {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    width: 100%;
-                    cursor: pointer;
-                    // background-color: aliceblue;
-                    height: 100%;
-                    // border-right: 1px solid black;
-                    box-sizing: border-box;
-                    padding: 20px;
-
-                    &:hover {
-                        background-color: lightgray;
-                        color: white;
-                        font-size: 25px;
-                        font-weight: bolder;
-                    }
-                }
-
-                .animelist-search-switch-name {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    width: 100%;
-                    cursor: pointer;
-                    // background-color: aliceblue;
-                    height: 100%;
-                    // border-right: 1px solid black;
-                    padding: 20px;
-                    box-sizing: border-box;
-
-                    &:hover {
-                        background-color: lightgray;
-                        color: white;
-                        font-size: 25px;
-                        font-weight: bolder;
-                    }
-                }
-
-                .animelist-search-switch-favorite {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    width: 100%;
-                    cursor: pointer;
-                    // background-color: aliceblue;
-                    height: 100%;
-                    // border-right: 1px solid black;
-                    box-sizing: border-box;
-                    padding: 20px;
-
-                    &:hover {
-                        background-color: lightgray;
-                        color: white;
-                        font-size: 25px;
-                        font-weight: bolder;
-                    }
-                }
-            }
-
-            .animelist-search-select-bar {
                 display: flex;
-                justify-content: space-evenly;
+                justify-content: center;
                 align-items: center;
-                width: 100%;
-                height: 100px;
+                flex-wrap: wrap;
                 box-sizing: border-box;
 
-                .animelist-search-input {
-                    padding: 10px;
+                .animelist-search-switch {
                     width: 100%;
-                    height: 100%;
+                    height: 100px;
+                    display: flex;
+                    justify-content: space-evenly;
+                    align-items: center;
+                    border-bottom: 1px solid black;
                     box-sizing: border-box;
-                    font-size: 30px;
-                    text-align: center;
-                    // border-radius: 30px;
-                    // box-shadow: 0 0 5px gray;
-                    color: lightgray;
-                    border: none;
-                    transition: all 0.25s ease-in-out;
+                    font-size: 25px;
+                    font-weight: bolder;
 
-                    &:focus {
-                        color: black;
-                        outline: none;
-                        font-size: 40px;
+                    .animelist-search-switch-year {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 100%;
+                        cursor: pointer;
+                        // background-color: aliceblue;
+                        height: 100%;
+                        // border-right: 1px solid black;
+                        box-sizing: border-box;
+                        padding: 20px;
+
+                        &:hover {
+                            background-color: lightgray;
+                            color: white;
+                            font-size: 25px;
+                            font-weight: bolder;
+                        }
                     }
 
-                    &:hover {
+                    .animelist-search-switch-name {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 100%;
                         cursor: pointer;
+                        // background-color: aliceblue;
+                        height: 100%;
+                        // border-right: 1px solid black;
+                        padding: 20px;
+                        box-sizing: border-box;
+
+                        &:hover {
+                            background-color: lightgray;
+                            color: white;
+                            font-size: 25px;
+                            font-weight: bolder;
+                        }
+                    }
+
+                    .animelist-search-switch-favorite {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 100%;
+                        cursor: pointer;
+                        // background-color: aliceblue;
+                        height: 100%;
+                        // border-right: 1px solid black;
+                        box-sizing: border-box;
+                        padding: 20px;
+
+                        &:hover {
+                            background-color: lightgray;
+                            color: white;
+                            font-size: 25px;
+                            font-weight: bolder;
+                        }
                     }
                 }
 
-                select {
-                    font-size: 20px;
-                    text-align: center;
-                    border: none;
+                .animelist-search-select-bar {
+                    display: flex;
+                    justify-content: space-evenly;
+                    align-items: center;
                     width: 100%;
                     height: 100px;
                     box-sizing: border-box;
 
-                    &:focus {
-                        outline: none;
-                    }
-
-                    &:hover {
-                        cursor: pointer;
-                    }
-
-                    option {
-                        text-align: center;
-                    }
-                }
-            }
-
-
-        }
-
-        .animelist-content {
-            width: 100%;
-            box-sizing: border-box;
-
-            .animelist-content-title {
-                font-size: 30px;
-                text-align: center;
-                line-height: 50px;
-                width: 100%;
-            }
-
-            .animelist-content-item {
-                width: 100%;
-                padding: 0 20px 20px;
-                box-sizing: border-box;
-
-                .animelist-content-item-title {
-                    width: 100%;
-                    font-size: clamp(16px, 3vw, 25px);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    box-sizing: border-box;
-                    background-color: black;
-                    color: white;
-                    padding: 10px;
-                    box-shadow: 0 0 5px black;
-                    border-top-left-radius: 15px;
-                    border-top-right-radius: 15px;
-                    border: 1px solid black;
-                }
-
-                .animelist-content-item-description {
-                    width: 100%;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    flex-wrap: wrap;
-                    // border: 1px solid black;
-                    box-sizing: border-box;
-                    position: relative;
-                    border-bottom-left-radius: 15px;
-                    border-bottom-right-radius: 15px;
-                    box-shadow: 0 0 5px black;
-
-                    .animelist-content-item-description-data {
-                        width: 100%;
+                    .animelist-search-input {
                         padding: 10px;
-                        font-size: clamp(16px, 3vw, 20px);
+                        width: 100%;
+                        height: 100%;
                         box-sizing: border-box;
-                        display: flex;
-                        justify-content: space-evenly;
-                        align-items: center;
+                        font-size: 30px;
+                        text-align: center;
+                        // border-radius: 30px;
+                        // box-shadow: 0 0 5px gray;
+                        color: lightgray;
+                        border: none;
+                        transition: all 0.25s ease-in-out;
 
-                        // flex-wrap: wrap;
-                        .animelist-content-item-description-data-mediatext,
-                        .animelist-content-item-description-data-officialsiteurl,
-                        .animelist-content-item-description-data-seasonnametext {
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            width: 100%;
-                            flex-wrap: wrap;
-                            flex-direction: column;
-                            // box-sizing: border-box;
-                            overflow: auto;
+                        &:focus {
+                            color: black;
+                            outline: none;
+                            font-size: 40px;
                         }
 
+                        &:hover {
+                            cursor: pointer;
+                        }
                     }
 
-                    .animelist-content-item-description-img {
-                        min-height: 100px;
+                    select {
+                        font-size: 20px;
+                        text-align: center;
+                        border: none;
+                        width: 100%;
+                        height: 100px;
+                        box-sizing: border-box;
+
+                        &:focus {
+                            outline: none;
+                        }
+
+                        &:hover {
+                            cursor: pointer;
+                        }
+
+                        option {
+                            text-align: center;
+                        }
+                    }
+                }
+
+
+            }
+
+            .animelist-content {
+                width: 100%;
+                box-sizing: border-box;
+
+                .animelist-content-title {
+                    font-size: 30px;
+                    text-align: center;
+                    line-height: 50px;
+                    width: 100%;
+                }
+
+                .animelist-content-item {
+                    width: 100%;
+                    padding: 0 20px 20px;
+                    box-sizing: border-box;
+
+                    .animelist-content-item-title {
+                        width: 100%;
+                        font-size: clamp(16px, 3vw, 25px);
                         display: flex;
                         justify-content: center;
                         align-items: center;
                         box-sizing: border-box;
+                        background-color: black;
+                        color: white;
+                        padding: 10px;
+                        box-shadow: 0 0 5px black;
+                        border-top-left-radius: 15px;
+                        border-top-right-radius: 15px;
+                        border: 1px solid black;
+                    }
 
-                        img {
+                    .animelist-content-item-description {
+                        width: 100%;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        flex-wrap: wrap;
+                        // border: 1px solid black;
+                        box-sizing: border-box;
+                        position: relative;
+                        border-bottom-left-radius: 15px;
+                        border-bottom-right-radius: 15px;
+                        box-shadow: 0 0 5px black;
+
+                        .animelist-content-item-description-data {
                             width: 100%;
+                            padding: 10px;
+                            font-size: clamp(16px, 3vw, 20px);
                             box-sizing: border-box;
+                            display: flex;
+                            justify-content: space-evenly;
+                            align-items: center;
+
+                            // flex-wrap: wrap;
+                            .animelist-content-item-description-data-mediatext,
+                            .animelist-content-item-description-data-officialsiteurl,
+                            .animelist-content-item-description-data-seasonnametext {
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                width: 100%;
+                                flex-wrap: wrap;
+                                flex-direction: column;
+                                // box-sizing: border-box;
+                                overflow: auto;
+                            }
+
                         }
 
-                        .animelist-content-item-description-img-favorite {
-                            position: absolute;
-                            top: 20px;
-                            right: 20px;
-                            background-color: white;
-                            width: 100px;
+                        .animelist-content-item-description-img {
+                            min-height: 100px;
                             display: flex;
                             justify-content: center;
                             align-items: center;
-                            height: 50px;
                             box-sizing: border-box;
-                            transition: all 0.2s linear;
-                            color: red;
-                            font-weight: bold;
-                            border-radius: 25px;
-                            border: 1px solid red;
 
-                            &:hover {
-                                cursor: pointer;
-                                background-color: red;
+                            img {
+                                width: 100%;
                                 box-sizing: border-box;
-                                color: white;
+                            }
+
+                            .animelist-content-item-description-img-favorite {
+                                position: absolute;
+                                top: 20px;
+                                right: 20px;
+                                background-color: white;
+                                width: 100px;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                height: 50px;
+                                box-sizing: border-box;
+                                transition: all 0.2s linear;
+                                color: red;
                                 font-weight: bold;
-                            }
-
-                            &:active {
-                                scale: 0.95;
-                            }
-                        }
-                    }
-                }
-
-                &:last-child {
-                    margin-bottom: 50px;
-                }
-            }
-        }
-
-        .animelist-favoritelist {
-            box-sizing: border-box;
-
-            .animelist-favoritelist-content {
-                .favoritelist-group {
-                    list-style: none;
-                    box-sizing: border-box;
-
-                    .favoritelist-item {
-                        height: 100%;
-                        border-bottom: 1px solid black;
-                        padding: 10px;
-                        box-sizing: border-box;
-
-                        &:last-child {
-                            margin-bottom: 50px;
-                            border: none;
-                        }
-
-                        .favoritelist-item-top {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-
-                            .favoritelist-item-top-title {
-                                width: 80%;
-                                font-size: 20px;
-                            }
-
-                            .favoritelist-item-top-button {
-                                padding: 10px;
-                                font-size: 16px;
-                                font-weight: bold;
-                                background-color: red;
-                                color: white;
-                                border-radius: 10px;
-                                text-align: center;
-                                cursor: pointer;
-                                border: 1px solid transparent;
-                                transition: all 0.2s ease-out;
+                                border-radius: 25px;
+                                border: 1px solid red;
 
                                 &:hover {
-                                    border: 1px solid red;
-                                    background-color: white;
-                                    color: red;
+                                    cursor: pointer;
+                                    background-color: red;
+                                    box-sizing: border-box;
+                                    color: white;
+                                    font-weight: bold;
                                 }
 
                                 &:active {
@@ -913,617 +857,621 @@ const deleteFavoritelistItem = (animeid) => {
                             }
                         }
                     }
+
+                    &:last-child {
+                        margin-bottom: 50px;
+                    }
                 }
             }
-        }
 
-        .user-box {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            background-color: rgba(0, 0, 0, 0.5);
+            .animelist-favoritelist {
+                box-sizing: border-box;
 
-            .user-box-login {
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 400px;
-                height: 400px;
-                background-color: white;
-                border-radius: 10px;
-
-                .user-box-login-content {
-                    padding: 30px;
-                    box-sizing: border-box;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: space-evenly;
-                    height: 100%;
-
-                    .user-box-login-content-out {
-                        font-size: 20px;
-                        padding: 10px;
-                        background-color: red;
-                        color: white;
-                        border-radius: 10px;
-                        text-align: center;
-                        cursor: pointer;
-                        border: 1px solid transparent;
-                        font-weight: bold;
-                        transition: all 0.2s ease-out;
-
-                        &:hover {
-                            background-color: white;
-                            color: red;
-                            border: 1px solid red;
-                            cursor: pointer;
-
-                        }
-
-                        &:active {
-                            scale: 0.95;
-                        }
-                    }
-
-                    .user-box-login-content-username {
-                        font-size: 20px;
-                        padding: 10px;
-                    }
-
-                    .user-box-login-content-password {
-                        font-size: 20px;
-                        padding: 10px;
-                    }
-
-                    .user-box-login-content-loginbtn {
-                        font-size: 20px;
-                        padding: 10px;
-                        width: 30%;
-                        margin: 0 auto;
-                        text-align: center;
-                        border-radius: 10px;
-                        border: 1px solid transparent;
+                .animelist-favoritelist-content {
+                    .favoritelist-group {
+                        list-style: none;
                         box-sizing: border-box;
-                        font-weight: bold;
-                        transition: all 0.2s ease-out;
 
-                        &:hover {
-                            cursor: pointer;
-                            border: 1px solid black;
+                        .favoritelist-item {
+                            height: 100%;
+                            border-bottom: 1px solid black;
+                            padding: 10px;
                             box-sizing: border-box;
-                            background-color: black;
-                            color: white;
-                        }
 
-                        &:active {
-                            scale: 0.95;
-                        }
-                    }
-                }
+                            &:last-child {
+                                margin-bottom: 50px;
+                                border: none;
+                            }
 
+                            .favoritelist-item-top {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
 
-            }
-        }
+                                .favoritelist-item-top-title {
+                                    width: 80%;
+                                    font-size: 20px;
+                                }
 
-        .user-logoutmsg {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            background-color: rgba(0, 0, 0, 0.5);
+                                .favoritelist-item-top-button {
+                                    padding: 10px;
+                                    font-size: 16px;
+                                    font-weight: bold;
+                                    background-color: red;
+                                    color: white;
+                                    border-radius: 10px;
+                                    text-align: center;
+                                    cursor: pointer;
+                                    border: 1px solid transparent;
+                                    transition: all 0.2s ease-out;
 
-            .user-logoutmsg-content {
-                width: 300px;
-                height: 300px;
-                background-color: white;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                text-align: center;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-evenly;
-                font-size: 30px;
-                border-radius: 10px;
-                padding: 20px;
-                font-weight: bold;
+                                    &:hover {
+                                        border: 1px solid red;
+                                        background-color: white;
+                                        color: red;
+                                    }
 
-                .user-logoutmsg-content-checkbutton {
-                    display: flex;
-                    justify-content: space-evenly;
-
-                    button {
-                        font-size: 20px;
-                        padding: 10px;
-                        width: 30%;
-                        margin: 0 auto;
-                        text-align: center;
-                        border-radius: 10px;
-                        border: 1px solid transparent;
-                        box-sizing: border-box;
-                        font-weight: bold;
-                        transition: all 0.2s ease-out;
-
-                        &:hover {
-                            cursor: pointer;
-                            border: 1px solid black;
-                            box-sizing: border-box;
-                            background-color: black;
-                            color: white;
-                        }
-
-                        &:active {
-                            scale: 0.95;
+                                    &:active {
+                                        scale: 0.95;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
-        }
 
-        .animelist-sidetoolbar {
-
-            // background-color: antiquewhite;
-            .animelist-sidetoolbar-box {
-                // background-color: aqua;
+            .user-box {
                 position: fixed;
-                display: flex;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                background-color: rgba(0, 0, 0, 0.5);
 
-                .animelist-sidetoolbar-item {
+                .user-box-login {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 400px;
+                    height: 400px;
                     background-color: white;
-                    // backdrop-filter: blur(5px);
-                    width: 50px;
-                    height: 50px;
-                    // border: 1px solid black;
-                    box-shadow: 0 0 5px gray;
-                    margin: 5px;
-                    font-size: 18px;
+                    border-radius: 10px;
+
+                    .user-box-login-content {
+                        padding: 30px;
+                        box-sizing: border-box;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-evenly;
+                        height: 100%;
+
+                        .user-box-login-content-out {
+                            font-size: 20px;
+                            padding: 10px;
+                            background-color: red;
+                            color: white;
+                            border-radius: 10px;
+                            text-align: center;
+                            cursor: pointer;
+                            border: 1px solid transparent;
+                            font-weight: bold;
+                            transition: all 0.2s ease-out;
+
+                            &:hover {
+                                background-color: white;
+                                color: red;
+                                border: 1px solid red;
+                                cursor: pointer;
+
+                            }
+
+                            &:active {
+                                scale: 0.95;
+                            }
+                        }
+
+                        .user-box-login-content-username {
+                            font-size: 20px;
+                            padding: 10px;
+                        }
+
+                        .user-box-login-content-password {
+                            font-size: 20px;
+                            padding: 10px;
+                        }
+
+                        .user-box-login-content-loginbtn {
+                            font-size: 20px;
+                            padding: 10px;
+                            width: 30%;
+                            margin: 0 auto;
+                            text-align: center;
+                            border-radius: 10px;
+                            border: 1px solid transparent;
+                            box-sizing: border-box;
+                            font-weight: bold;
+                            transition: all 0.2s ease-out;
+
+                            &:hover {
+                                cursor: pointer;
+                                border: 1px solid black;
+                                box-sizing: border-box;
+                                background-color: black;
+                                color: white;
+                            }
+
+                            &:active {
+                                scale: 0.95;
+                            }
+                        }
+                    }
+
+
+                }
+            }
+
+            .user-logoutmsg {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+
+                .user-logoutmsg-content {
+                    width: 300px;
+                    height: 300px;
+                    background-color: white;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
                     text-align: center;
                     display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    transition: all 0.2s linear;
-                    padding: 5px;
+                    flex-direction: column;
+                    justify-content: space-evenly;
+                    font-size: 30px;
+                    border-radius: 10px;
+                    padding: 20px;
+                    font-weight: bold;
 
-                    // border-radius: 50px;
-                    // box-sizing: border-box;
-                    &:hover {
-                        cursor: pointer;
-                        background-color: lightgray;
-                        color: white;
-                        // border: 1px solid transparent;
-                        box-shadow: 0 0 5px gray;
+                    .user-logoutmsg-content-checkbutton {
+                        display: flex;
+                        justify-content: space-evenly;
+
+                        button {
+                            font-size: 20px;
+                            padding: 10px;
+                            width: 30%;
+                            margin: 0 auto;
+                            text-align: center;
+                            border-radius: 10px;
+                            border: 1px solid transparent;
+                            box-sizing: border-box;
+                            font-weight: bold;
+                            transition: all 0.2s ease-out;
+
+                            &:hover {
+                                cursor: pointer;
+                                border: 1px solid black;
+                                box-sizing: border-box;
+                                background-color: black;
+                                color: white;
+                            }
+
+                            &:active {
+                                scale: 0.95;
+                            }
+                        }
                     }
-
-                    &:active {
-                        scale: 0.95;
-                        background-color: gray;
-                        color: white;
-                    }
                 }
-
-                .sidetoolbar-nowuser-item {}
-
-                .sidetoolbar-favorite-item {
-                    // top: 210px;
-                }
-
-                .sidetoolbar-backhome-item {
-                    // top: 210px;
-                }
-
-                .sidetoolbar-logout-item {
-                    // top: 270px;
-                }
-
-                .sidetoolbar-backtop-item {
-                    // top: 330px;
-                }
-
             }
 
+            .animelist-sidetoolbar {
 
-
-
-        }
-
-        .user-about {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-
-            .user-about-box {
-                width: 600px;
-                height: 400px;
-                background-color: white;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                box-sizing: border-box;
-                border: 1px solid black;
-                border-radius: 10px;
-                padding: 20px;
-
-                .user-about-box-content {
+                // background-color: antiquewhite;
+                .animelist-sidetoolbar-box {
+                    // background-color: aqua;
+                    position: fixed;
                     display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    flex-direction: column;
-                    height: 100%;
 
-                    .user-about-box-content-userinfo {
-                        background-color: aliceblue;
-                        width: 100%;
-                        height: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-evenly;
-                        border: 1px black solid;
-                        box-sizing: border-box;
-                        border-radius: 5px;
-                        flex-wrap: wrap;
-
-                        .user-about-box-content-userinfo-icon {
-                            width: 80px;
-                            height: 80px;
-                            border-radius: 40px;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            border: 1px black solid;
-                            box-sizing: border-box;
-                            background-color: white;
-
-                        }
-
-                        .user-about-box-content-userinfo-uid {
-                            font-size: 16px;
-                            font-weight: bold;
-                            text-align: center;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            flex-wrap: wrap;
-                        }
-
-                        // .user-about-box-content-userinfo-name {
-                        //     font-size: 20px;
-                        //     font-weight: bold;
-                        //     text-align: center;
-                        // }
-                    }
-
-                    .user-about-box-content-check {
-                        background-color: red;
-                        width: 50%;
+                    .animelist-sidetoolbar-item {
+                        background-color: white;
+                        // backdrop-filter: blur(5px);
+                        width: 50px;
+                        height: 50px;
+                        // border: 1px solid black;
+                        box-shadow: 0 0 5px gray;
+                        margin: 5px;
+                        font-size: 18px;
                         text-align: center;
-                        border-radius: 10px;
-                        font-weight: bold;
-                        box-sizing: border-box;
-                        color: white;
-                        border: 1px solid transparent;
-                        font-size: 20px;
-                        padding: 10px;
-                        cursor: pointer;
-                        transition: all 0.2s ease-out;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        transition: all 0.2s linear;
+                        padding: 5px;
 
+                        // border-radius: 50px;
+                        // box-sizing: border-box;
                         &:hover {
                             cursor: pointer;
-                            background-color: white;
-                            color: red;
-                            border: 1px solid red;
-                            box-sizing: border-box;
+                            background-color: lightgray;
+                            color: white;
+                            // border: 1px solid transparent;
+                            box-shadow: 0 0 5px gray;
                         }
 
                         &:active {
                             scale: 0.95;
+                            background-color: gray;
+                            color: white;
+                        }
+                    }
+
+                    .sidetoolbar-nowuser-item {}
+
+                    .sidetoolbar-favorite-item {
+                        // top: 210px;
+                    }
+
+                    .sidetoolbar-backhome-item {
+                        // top: 210px;
+                    }
+
+                    .sidetoolbar-logout-item {
+                        // top: 270px;
+                    }
+
+                    .sidetoolbar-backtop-item {
+                        // top: 330px;
+                    }
+
+                }
+
+
+
+
+            }
+
+            .user-about {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+
+                .user-about-box {
+                    width: 600px;
+                    height: 400px;
+                    background-color: white;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    box-sizing: border-box;
+                    border: 1px solid black;
+                    border-radius: 10px;
+                    padding: 20px;
+
+                    .user-about-box-content {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        flex-direction: column;
+                        height: 100%;
+
+                        .user-about-box-content-userinfo {
+                            background-color: aliceblue;
+                            width: 100%;
+                            height: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-evenly;
+                            border: 1px black solid;
+                            box-sizing: border-box;
+                            border-radius: 5px;
+                            flex-wrap: wrap;
+
+                            .user-about-box-content-userinfo-icon {
+                                width: 80px;
+                                height: 80px;
+                                border-radius: 40px;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                border: 1px black solid;
+                                box-sizing: border-box;
+                                background-color: white;
+
+                            }
+
+                            .user-about-box-content-userinfo-uid {
+                                font-size: 16px;
+                                font-weight: bold;
+                                text-align: center;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                flex-wrap: wrap;
+                            }
+
+                            // .user-about-box-content-userinfo-name {
+                            //     font-size: 20px;
+                            //     font-weight: bold;
+                            //     text-align: center;
+                            // }
+                        }
+
+                        .user-about-box-content-check {
+                            background-color: red;
+                            width: 50%;
+                            text-align: center;
+                            border-radius: 10px;
+                            font-weight: bold;
+                            box-sizing: border-box;
+                            color: white;
+                            border: 1px solid transparent;
+                            font-size: 20px;
+                            padding: 10px;
+                            cursor: pointer;
+                            transition: all 0.2s ease-out;
+
+                            &:hover {
+                                cursor: pointer;
+                                background-color: white;
+                                color: red;
+                                border: 1px solid red;
+                                box-sizing: border-box;
+                            }
+
+                            &:active {
+                                scale: 0.95;
+                            }
                         }
                     }
                 }
             }
         }
     }
-}
 }
 
 @media (any-hover: none) {
     .main {
-    background-color: aliceblue;
-    width: 100%;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    // scroll-behavior: smooth;
+        background-color: aliceblue;
+        width: 100%;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        // scroll-behavior: smooth;
 
-    .container {
-        max-width: 1200px;
-        box-sizing: border-box;
-        background-color: white;
-        box-shadow: 0 0 5px gray;
-        position: relative;
-
-        .animelist-search {
-            background-color: white;
-            border-bottom: 1px solid black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
+        .container {
+            max-width: 1200px;
             box-sizing: border-box;
+            background-color: white;
+            box-shadow: 0 0 5px gray;
+            position: relative;
 
-            .animelist-search-switch {
-                width: 100%;
-                height: 100px;
-                display: flex;
-                justify-content: space-evenly;
-                align-items: center;
+            .animelist-search {
+                background-color: white;
                 border-bottom: 1px solid black;
-                box-sizing: border-box;
-                font-size: 25px;
-                font-weight: bolder;
-
-                .animelist-search-switch-year {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    width: 100%;
-                    cursor: pointer;
-                    // background-color: aliceblue;
-                    height: 100%;
-                    // border-right: 1px solid black;
-                    box-sizing: border-box;
-                    padding: 20px;
-
-                    
-                }
-
-                .animelist-search-switch-name {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    width: 100%;
-                    cursor: pointer;
-                    // background-color: aliceblue;
-                    height: 100%;
-                    // border-right: 1px solid black;
-                    padding: 20px;
-                    box-sizing: border-box;
-
-                    
-                }
-
-                .animelist-search-switch-favorite {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    width: 100%;
-                    cursor: pointer;
-                    // background-color: aliceblue;
-                    height: 100%;
-                    // border-right: 1px solid black;
-                    box-sizing: border-box;
-                    padding: 20px;
-
-                    
-                }
-            }
-
-            .animelist-search-select-bar {
                 display: flex;
-                justify-content: space-evenly;
+                justify-content: center;
                 align-items: center;
-                width: 100%;
-                height: 100px;
+                flex-wrap: wrap;
                 box-sizing: border-box;
 
-                .animelist-search-input {
-                    padding: 10px;
+                .animelist-search-switch {
                     width: 100%;
-                    height: 100%;
+                    height: 100px;
+                    display: flex;
+                    justify-content: space-evenly;
+                    align-items: center;
+                    border-bottom: 1px solid black;
                     box-sizing: border-box;
-                    font-size: 30px;
-                    text-align: center;
-                    // border-radius: 30px;
-                    // box-shadow: 0 0 5px gray;
-                    color: lightgray;
-                    border: none;
-                    transition: all 0.25s ease-in-out;
+                    font-size: 25px;
+                    font-weight: bolder;
 
-                    &:focus {
-                        color: black;
-                        outline: none;
-                        font-size: 40px;
+                    .animelist-search-switch-year {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 100%;
+                        cursor: pointer;
+                        // background-color: aliceblue;
+                        height: 100%;
+                        // border-right: 1px solid black;
+                        box-sizing: border-box;
+                        padding: 20px;
+
+
                     }
 
-                    
+                    .animelist-search-switch-name {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 100%;
+                        cursor: pointer;
+                        // background-color: aliceblue;
+                        height: 100%;
+                        // border-right: 1px solid black;
+                        padding: 20px;
+                        box-sizing: border-box;
+
+
+                    }
+
+                    .animelist-search-switch-favorite {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 100%;
+                        cursor: pointer;
+                        // background-color: aliceblue;
+                        height: 100%;
+                        // border-right: 1px solid black;
+                        box-sizing: border-box;
+                        padding: 20px;
+
+
+                    }
                 }
 
-                select {
-                    font-size: 20px;
-                    text-align: center;
-                    border: none;
+                .animelist-search-select-bar {
+                    display: flex;
+                    justify-content: space-evenly;
+                    align-items: center;
                     width: 100%;
                     height: 100px;
                     box-sizing: border-box;
 
-                    &:focus {
-                        outline: none;
-                    }
-
-                    
-
-                    option {
-                        text-align: center;
-                    }
-                }
-            }
-
-
-        }
-
-        .animelist-content {
-            width: 100%;
-            box-sizing: border-box;
-
-            .animelist-content-title {
-                font-size: 30px;
-                text-align: center;
-                line-height: 50px;
-                width: 100%;
-            }
-
-            .animelist-content-item {
-                width: 100%;
-                padding: 0 20px 20px;
-                box-sizing: border-box;
-
-                .animelist-content-item-title {
-                    width: 100%;
-                    font-size: clamp(16px, 3vw, 25px);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    box-sizing: border-box;
-                    background-color: black;
-                    color: white;
-                    padding: 10px;
-                    box-shadow: 0 0 5px black;
-                    border-top-left-radius: 15px;
-                    border-top-right-radius: 15px;
-                    border: 1px solid black;
-                }
-
-                .animelist-content-item-description {
-                    width: 100%;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    flex-wrap: wrap;
-                    // border: 1px solid black;
-                    box-sizing: border-box;
-                    position: relative;
-                    border-bottom-left-radius: 15px;
-                    border-bottom-right-radius: 15px;
-                    box-shadow: 0 0 5px black;
-
-                    .animelist-content-item-description-data {
-                        width: 100%;
+                    .animelist-search-input {
                         padding: 10px;
-                        font-size: clamp(16px, 3vw, 20px);
+                        width: 100%;
+                        height: 100%;
                         box-sizing: border-box;
-                        display: flex;
-                        justify-content: space-evenly;
-                        align-items: center;
+                        font-size: 30px;
+                        text-align: center;
+                        // border-radius: 30px;
+                        // box-shadow: 0 0 5px gray;
+                        color: lightgray;
+                        border: none;
+                        transition: all 0.25s ease-in-out;
 
-                        // flex-wrap: wrap;
-                        .animelist-content-item-description-data-mediatext,
-                        .animelist-content-item-description-data-officialsiteurl,
-                        .animelist-content-item-description-data-seasonnametext {
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            width: 100%;
-                            flex-wrap: wrap;
-                            flex-direction: column;
-                            // box-sizing: border-box;
-                            overflow: auto;
+                        &:focus {
+                            color: black;
+                            outline: none;
+                            font-size: 40px;
                         }
 
+
                     }
 
-                    .animelist-content-item-description-img {
-                        min-height: 100px;
+                    select {
+                        font-size: 20px;
+                        text-align: center;
+                        border: none;
+                        width: 100%;
+                        height: 100px;
+                        box-sizing: border-box;
+
+                        &:focus {
+                            outline: none;
+                        }
+
+
+
+                        option {
+                            text-align: center;
+                        }
+                    }
+                }
+
+
+            }
+
+            .animelist-content {
+                width: 100%;
+                box-sizing: border-box;
+
+                .animelist-content-title {
+                    font-size: 30px;
+                    text-align: center;
+                    line-height: 50px;
+                    width: 100%;
+                }
+
+                .animelist-content-item {
+                    width: 100%;
+                    padding: 0 20px 20px;
+                    box-sizing: border-box;
+
+                    .animelist-content-item-title {
+                        width: 100%;
+                        font-size: clamp(16px, 3vw, 25px);
                         display: flex;
                         justify-content: center;
                         align-items: center;
                         box-sizing: border-box;
+                        background-color: black;
+                        color: white;
+                        padding: 10px;
+                        box-shadow: 0 0 5px black;
+                        border-top-left-radius: 15px;
+                        border-top-right-radius: 15px;
+                        border: 1px solid black;
+                    }
 
-                        img {
+                    .animelist-content-item-description {
+                        width: 100%;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        flex-wrap: wrap;
+                        // border: 1px solid black;
+                        box-sizing: border-box;
+                        position: relative;
+                        border-bottom-left-radius: 15px;
+                        border-bottom-right-radius: 15px;
+                        box-shadow: 0 0 5px black;
+
+                        .animelist-content-item-description-data {
                             width: 100%;
+                            padding: 10px;
+                            font-size: clamp(16px, 3vw, 20px);
                             box-sizing: border-box;
+                            display: flex;
+                            justify-content: space-evenly;
+                            align-items: center;
+
+                            // flex-wrap: wrap;
+                            .animelist-content-item-description-data-mediatext,
+                            .animelist-content-item-description-data-officialsiteurl,
+                            .animelist-content-item-description-data-seasonnametext {
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                width: 100%;
+                                flex-wrap: wrap;
+                                flex-direction: column;
+                                // box-sizing: border-box;
+                                overflow: auto;
+                            }
+
                         }
 
-                        .animelist-content-item-description-img-favorite {
-                            position: absolute;
-                            top: 20px;
-                            right: 20px;
-                            background-color: white;
-                            width: 100px;
+                        .animelist-content-item-description-img {
+                            min-height: 100px;
                             display: flex;
                             justify-content: center;
                             align-items: center;
-                            height: 50px;
                             box-sizing: border-box;
-                            transition: all 0.2s linear;
-                            color: red;
-                            font-weight: bold;
-                            border-radius: 25px;
-                            border: 1px solid red;
 
-                            
-
-                            &:active {
-                                scale: 0.95;
-                            }
-                        }
-                    }
-                }
-
-                &:last-child {
-                    margin-bottom: 50px;
-                }
-            }
-        }
-
-        .animelist-favoritelist {
-            box-sizing: border-box;
-
-            .animelist-favoritelist-content {
-                .favoritelist-group {
-                    list-style: none;
-                    box-sizing: border-box;
-
-                    .favoritelist-item {
-                        height: 100%;
-                        border-bottom: 1px solid black;
-                        padding: 10px;
-                        box-sizing: border-box;
-
-                        &:last-child {
-                            margin-bottom: 50px;
-                            border: none;
-                        }
-
-                        .favoritelist-item-top {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-
-                            .favoritelist-item-top-title {
-                                width: 80%;
-                                font-size: 20px;
+                            img {
+                                width: 100%;
+                                box-sizing: border-box;
                             }
 
-                            .favoritelist-item-top-button {
-                                padding: 10px;
-                                font-size: 16px;
+                            .animelist-content-item-description-img-favorite {
+                                position: absolute;
+                                top: 20px;
+                                right: 20px;
+                                background-color: white;
+                                width: 100px;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                height: 50px;
+                                box-sizing: border-box;
+                                transition: all 0.2s linear;
+                                color: red;
                                 font-weight: bold;
-                                background-color: red;
-                                color: white;
-                                border-radius: 10px;
-                                text-align: center;
-                                cursor: pointer;
-                                border: 1px solid transparent;
-                                transition: all 0.2s ease-out;
+                                border-radius: 25px;
+                                border: 1px solid red;
 
-                                
+
 
                                 &:active {
                                     scale: 0.95;
@@ -1531,294 +1479,350 @@ const deleteFavoritelistItem = (animeid) => {
                             }
                         }
                     }
+
+                    &:last-child {
+                        margin-bottom: 50px;
+                    }
                 }
             }
-        }
 
-        .user-box {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            background-color: rgba(0, 0, 0, 0.5);
+            .animelist-favoritelist {
+                box-sizing: border-box;
 
-            .user-box-login {
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 400px;
-                height: 400px;
-                background-color: white;
-                border-radius: 10px;
-
-                .user-box-login-content {
-                    padding: 30px;
-                    box-sizing: border-box;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: space-evenly;
-                    height: 100%;
-
-                    .user-box-login-content-out {
-                        font-size: 20px;
-                        padding: 10px;
-                        background-color: red;
-                        color: white;
-                        border-radius: 10px;
-                        text-align: center;
-                        cursor: pointer;
-                        border: 1px solid transparent;
-                        font-weight: bold;
-                        transition: all 0.2s ease-out;
-
-                        
-
-                        &:active {
-                            scale: 0.95;
-                        }
-                    }
-
-                    .user-box-login-content-username {
-                        font-size: 20px;
-                        padding: 10px;
-                    }
-
-                    .user-box-login-content-password {
-                        font-size: 20px;
-                        padding: 10px;
-                    }
-
-                    .user-box-login-content-loginbtn {
-                        font-size: 20px;
-                        padding: 10px;
-                        width: 30%;
-                        margin: 0 auto;
-                        text-align: center;
-                        border-radius: 10px;
-                        border: 1px solid transparent;
+                .animelist-favoritelist-content {
+                    .favoritelist-group {
+                        list-style: none;
                         box-sizing: border-box;
-                        font-weight: bold;
-                        transition: all 0.2s ease-out;
 
-                        
+                        .favoritelist-item {
+                            height: 100%;
+                            border-bottom: 1px solid black;
+                            padding: 10px;
+                            box-sizing: border-box;
 
-                        &:active {
-                            scale: 0.95;
-                        }
-                    }
-                }
+                            &:last-child {
+                                margin-bottom: 50px;
+                                border: none;
+                            }
+
+                            .favoritelist-item-top {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+
+                                .favoritelist-item-top-title {
+                                    width: 80%;
+                                    font-size: 20px;
+                                }
+
+                                .favoritelist-item-top-button {
+                                    padding: 10px;
+                                    font-size: 16px;
+                                    font-weight: bold;
+                                    background-color: red;
+                                    color: white;
+                                    border-radius: 10px;
+                                    text-align: center;
+                                    cursor: pointer;
+                                    border: 1px solid transparent;
+                                    transition: all 0.2s ease-out;
 
 
-            }
-        }
 
-        .user-logoutmsg {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-
-            .user-logoutmsg-content {
-                width: 300px;
-                height: 300px;
-                background-color: white;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                text-align: center;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-evenly;
-                font-size: 30px;
-                border-radius: 10px;
-                padding: 20px;
-                font-weight: bold;
-
-                .user-logoutmsg-content-checkbutton {
-                    display: flex;
-                    justify-content: space-evenly;
-
-                    button {
-                        font-size: 20px;
-                        padding: 10px;
-                        width: 30%;
-                        margin: 0 auto;
-                        text-align: center;
-                        border-radius: 10px;
-                        border: 1px solid transparent;
-                        box-sizing: border-box;
-                        font-weight: bold;
-                        transition: all 0.2s ease-out;
-
-                        
-
-                        &:active {
-                            scale: 0.95;
+                                    &:active {
+                                        scale: 0.95;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
-        }
 
-        .animelist-sidetoolbar {
-
-            // background-color: antiquewhite;
-            .animelist-sidetoolbar-box {
-                // background-color: aqua;
+            .user-box {
                 position: fixed;
-                display: flex;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                background-color: rgba(0, 0, 0, 0.5);
 
-                .animelist-sidetoolbar-item {
+                .user-box-login {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 400px;
+                    height: 400px;
                     background-color: white;
-                    // backdrop-filter: blur(5px);
-                    width: 50px;
-                    height: 50px;
-                    // border: 1px solid black;
-                    box-shadow: 0 0 5px gray;
-                    margin: 5px;
-                    font-size: 18px;
+                    border-radius: 10px;
+
+                    .user-box-login-content {
+                        padding: 30px;
+                        box-sizing: border-box;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-evenly;
+                        height: 100%;
+
+                        .user-box-login-content-out {
+                            font-size: 20px;
+                            padding: 10px;
+                            background-color: red;
+                            color: white;
+                            border-radius: 10px;
+                            text-align: center;
+                            cursor: pointer;
+                            border: 1px solid transparent;
+                            font-weight: bold;
+                            transition: all 0.2s ease-out;
+
+
+
+                            &:active {
+                                scale: 0.95;
+                            }
+                        }
+
+                        .user-box-login-content-username {
+                            font-size: 20px;
+                            padding: 10px;
+                        }
+
+                        .user-box-login-content-password {
+                            font-size: 20px;
+                            padding: 10px;
+                        }
+
+                        .user-box-login-content-loginbtn {
+                            font-size: 20px;
+                            padding: 10px;
+                            width: 30%;
+                            margin: 0 auto;
+                            text-align: center;
+                            border-radius: 10px;
+                            border: 1px solid transparent;
+                            box-sizing: border-box;
+                            font-weight: bold;
+                            transition: all 0.2s ease-out;
+
+
+
+                            &:active {
+                                scale: 0.95;
+                            }
+                        }
+                    }
+
+
+                }
+            }
+
+            .user-logoutmsg {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+
+                .user-logoutmsg-content {
+                    width: 300px;
+                    height: 300px;
+                    background-color: white;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
                     text-align: center;
                     display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    transition: all 0.2s linear;
-                    padding: 5px;
+                    flex-direction: column;
+                    justify-content: space-evenly;
+                    font-size: 30px;
+                    border-radius: 10px;
+                    padding: 20px;
+                    font-weight: bold;
 
-                    // border-radius: 50px;
-                    // box-sizing: border-box;
-                    
+                    .user-logoutmsg-content-checkbutton {
+                        display: flex;
+                        justify-content: space-evenly;
 
-                    &:active {
-                        scale: 0.95;
-                        background-color: gray;
-                        color: white;
+                        button {
+                            font-size: 20px;
+                            padding: 10px;
+                            width: 30%;
+                            margin: 0 auto;
+                            text-align: center;
+                            border-radius: 10px;
+                            border: 1px solid transparent;
+                            box-sizing: border-box;
+                            font-weight: bold;
+                            transition: all 0.2s ease-out;
+
+
+
+                            &:active {
+                                scale: 0.95;
+                            }
+                        }
                     }
                 }
-
-                .sidetoolbar-nowuser-item {}
-
-                .sidetoolbar-favorite-item {
-                    // top: 210px;
-                }
-
-                .sidetoolbar-backhome-item {
-                    // top: 210px;
-                }
-
-                .sidetoolbar-logout-item {
-                    // top: 270px;
-                }
-
-                .sidetoolbar-backtop-item {
-                    // top: 330px;
-                }
-
             }
 
+            .animelist-sidetoolbar {
 
-
-
-        }
-
-        .user-about {
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-
-            .user-about-box {
-                width: 600px;
-                height: 400px;
-                background-color: white;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                box-sizing: border-box;
-                border: 1px solid black;
-                border-radius: 10px;
-                padding: 20px;
-
-                .user-about-box-content {
+                // background-color: antiquewhite;
+                .animelist-sidetoolbar-box {
+                    // background-color: aqua;
+                    position: fixed;
                     display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    flex-direction: column;
-                    height: 100%;
 
-                    .user-about-box-content-userinfo {
-                        background-color: aliceblue;
-                        width: 100%;
-                        height: 50%;
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-evenly;
-                        border: 1px black solid;
-                        box-sizing: border-box;
-                        border-radius: 5px;
-                        flex-wrap: wrap;
-
-                        .user-about-box-content-userinfo-icon {
-                            width: 80px;
-                            height: 80px;
-                            border-radius: 40px;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            border: 1px black solid;
-                            box-sizing: border-box;
-                            background-color: white;
-
-                        }
-
-                        .user-about-box-content-userinfo-uid {
-                            font-size: 16px;
-                            font-weight: bold;
-                            text-align: center;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            flex-wrap: wrap;
-                        }
-
-                        // .user-about-box-content-userinfo-name {
-                        //     font-size: 20px;
-                        //     font-weight: bold;
-                        //     text-align: center;
-                        // }
-                    }
-
-                    .user-about-box-content-check {
-                        background-color: red;
-                        width: 50%;
+                    .animelist-sidetoolbar-item {
+                        background-color: white;
+                        // backdrop-filter: blur(5px);
+                        width: 50px;
+                        height: 50px;
+                        // border: 1px solid black;
+                        box-shadow: 0 0 5px gray;
+                        margin: 5px;
+                        font-size: 18px;
                         text-align: center;
-                        border-radius: 10px;
-                        font-weight: bold;
-                        box-sizing: border-box;
-                        color: white;
-                        border: 1px solid transparent;
-                        font-size: 20px;
-                        padding: 10px;
-                        cursor: pointer;
-                        transition: all 0.2s ease-out;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        transition: all 0.2s linear;
+                        padding: 5px;
 
-                        
+                        // border-radius: 50px;
+                        // box-sizing: border-box;
+
 
                         &:active {
                             scale: 0.95;
+                            background-color: gray;
+                            color: white;
+                        }
+                    }
+
+                    .sidetoolbar-nowuser-item {}
+
+                    .sidetoolbar-favorite-item {
+                        // top: 210px;
+                    }
+
+                    .sidetoolbar-backhome-item {
+                        // top: 210px;
+                    }
+
+                    .sidetoolbar-logout-item {
+                        // top: 270px;
+                    }
+
+                    .sidetoolbar-backtop-item {
+                        // top: 330px;
+                    }
+
+                }
+
+
+
+
+            }
+
+            .user-about {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+
+                .user-about-box {
+                    width: 600px;
+                    height: 400px;
+                    background-color: white;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    box-sizing: border-box;
+                    border: 1px solid black;
+                    border-radius: 10px;
+                    padding: 20px;
+
+                    .user-about-box-content {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        flex-direction: column;
+                        height: 100%;
+
+                        .user-about-box-content-userinfo {
+                            background-color: aliceblue;
+                            width: 100%;
+                            height: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-evenly;
+                            border: 1px black solid;
+                            box-sizing: border-box;
+                            border-radius: 5px;
+                            flex-wrap: wrap;
+
+                            .user-about-box-content-userinfo-icon {
+                                width: 80px;
+                                height: 80px;
+                                border-radius: 40px;
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                border: 1px black solid;
+                                box-sizing: border-box;
+                                background-color: white;
+
+                            }
+
+                            .user-about-box-content-userinfo-uid {
+                                font-size: 16px;
+                                font-weight: bold;
+                                text-align: center;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                flex-wrap: wrap;
+                            }
+
+                            // .user-about-box-content-userinfo-name {
+                            //     font-size: 20px;
+                            //     font-weight: bold;
+                            //     text-align: center;
+                            // }
+                        }
+
+                        .user-about-box-content-check {
+                            background-color: red;
+                            width: 50%;
+                            text-align: center;
+                            border-radius: 10px;
+                            font-weight: bold;
+                            box-sizing: border-box;
+                            color: white;
+                            border: 1px solid transparent;
+                            font-size: 20px;
+                            padding: 10px;
+                            cursor: pointer;
+                            transition: all 0.2s ease-out;
+
+
+
+                            &:active {
+                                scale: 0.95;
+                            }
                         }
                     }
                 }
             }
         }
     }
-}
 }
 
 
