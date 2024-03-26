@@ -32,13 +32,13 @@ const getGeolocation = async () => {
         const res = await axios.post("https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c")
         console.log(res.data)
         response.value = res.data
-        responseobject.value = JSON.stringify(res.data)
-
+        addGeoLocationData(res.data.location)
     } catch (error) {
         console.log('發生錯誤', error)
     }
 
 }
+
 
 //獲取裝置地址座標
 const getUserLocation = () => {
@@ -57,6 +57,7 @@ const getUserLocation = () => {
         })
     } else {
         alert('無法取得位置');
+
     }
 }
 //獲取裝置地址座標
@@ -124,10 +125,9 @@ const addNewGeoLocationData = () => {
 .map {
     width: 100%;
     height: 100%;
-    display: flex;
 
     .map-content {
-        width: 50%;
+        width: 100%;
         height: 100vh;
         background-color: antiquewhite;
         display: flex;
@@ -142,7 +142,7 @@ const addNewGeoLocationData = () => {
     }
 
     .map-function {
-        width: 50%;
+        width: 100%;
         height: 100vh;
         background-color: bisque;
         display: flex;
