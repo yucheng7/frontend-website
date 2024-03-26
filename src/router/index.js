@@ -15,7 +15,7 @@ const router = createRouter({
       component: () => import('../views/TwitterClone.vue')
     },
     {
-      path: '/',
+      path: '/animelist',
       name: 'animelist',
       // meta: {
       //   keepAlive: false
@@ -23,7 +23,7 @@ const router = createRouter({
       component: () => import('../views/AnimeList.vue')
     },
     {
-      path: '/mapproject',
+      path: '/',
       name: 'mapproject',
       component: () => import('../views/MapProject.vue')
     },
