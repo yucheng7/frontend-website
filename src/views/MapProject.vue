@@ -1,6 +1,28 @@
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics"
+import { getDatabase, ref as databaseRef, child, set, get } from "firebase/database"
+
+
+//firebase初始化
+const firebaseConfig = {
+    apiKey: "AIzaSyCTqAGZ31eOT4AsKMzGK5ww6qB9f7TAvN4",
+    authDomain: "animelist-data.firebaseapp.com",
+    databaseURL: "https://animelist-data-default-rtdb.firebaseio.com",
+    projectId: "animelist-data",
+    storageBucket: "animelist-data.appspot.com",
+    messagingSenderId: "675562826331",
+    appId: "1:675562826331:web:a1842329db9e00be64ad7e",
+    measurementId: "G-CD2Q1681M7"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+
+//firebase初始化
 
 const response = ref('')
 const responseobject = ref('')
@@ -18,22 +40,62 @@ const getGeolocation = async () => {
 
 }
 
+//獲取裝置地址座標
 const getUserLocation = () => {
     if (navigator.geolocation) {
         alert('可以取得位置');
         navigator.geolocation.getCurrentPosition((position) => {
-            
+
             let object = {
                 latitude: position.coords.latitude,
                 longitude: position.coords.longitude
             }
             responseobject.value = JSON.stringify(object)
             console.log("取得位置成功", responseobject.value);
+            response.value = object.latitude, object.longitude
+            addGeoLocationData(object)
         })
     } else {
         alert('無法取得位置');
     }
 }
+//獲取裝置地址座標
+
+
+//新增資料
+const addGeoLocationData = async(object) => {    
+    const realtimeDatabase = await getDatabaseData() //獲取舊資料
+    console.log(realtimeDatabase);
+    const newArray = []
+    console.log(...realtimeDatabase.data.geo);
+    newArray.push(...realtimeDatabase.data.geo)  //push舊資料
+    newArray.push(object)//push新資料
+    console.log(newArray);
+    const database = getDatabase()
+    set(databaseRef(database, 'data/geo'), newArray)
+    console.log('新增成功');
+}
+//新增資料
+//獲取目前的資料
+const getDatabaseData = async () => {
+    const database = getDatabase();
+    const snapshot = await get(databaseRef(database, '/'));
+    saveData.value = JSON.stringify(snapshot.val()); // snapshot.val();
+    // console.log(saveData.value);
+    // console.log(snapshot.val());
+    return snapshot.val();
+}
+//獲取目前的資料
+const saveData = ref('')
+//新增預設資料
+const addNewGeoLocationData = () => {
+    const database = getDatabase()
+    set(databaseRef(database, 'data/geo'), [{latitude: 25.0777864, longitude: 121.5719522}])
+    console.log('新增新資料成功');
+}
+//新增預設資料
+
+
 
 </script>
 
@@ -48,7 +110,10 @@ const getUserLocation = () => {
                 <div class="map-function-item-response">
                     <input type="text" value="" v-model="response">
                     <textarea name="" id="" cols="30" rows="10" v-model="responseobject"></textarea>
-                    <button @click="getUserLocation">點擊獲取</button>
+                    <button @click="getDatabaseData">點擊獲取</button>
+                    <button @click="getUserLocation">點擊修改</button>
+                    <button @click="addNewGeoLocationData">點擊新增資料</button>
+                    <textarea name="" id="" cols="30" rows="10" v-model="saveData"></textarea>
                 </div>
             </div>
         </div>
