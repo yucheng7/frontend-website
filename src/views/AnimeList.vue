@@ -424,7 +424,7 @@ const deleteFavoritelistItem = (animeid) => {
                             </div>
                             <div class="animelist-content-item-description">
                                 <div class="animelist-content-item-description-img">
-                                    <a :href="item.images.facebook.og_image_url">
+                                    <a :href="item.official_site_url">
                                         <img v-if="item.images.facebook.og_image_url"
                                             :src="item.images.facebook.og_image_url" alt="" srcset="">
                                     </a>
@@ -465,7 +465,7 @@ const deleteFavoritelistItem = (animeid) => {
                             </div>
                             <div class="animelist-content-item-description">
                                 <div class="animelist-content-item-description-img">
-                                    <a :href="item.images.facebook.og_image_url">
+                                    <a :href="item.official_site_url">
                                         <img v-if="item.images.facebook.og_image_url"
                                             :src="item.images.facebook.og_image_url" alt="" srcset="">
                                     </a>
