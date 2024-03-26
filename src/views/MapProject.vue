@@ -18,6 +18,14 @@ const getGeolocation = async () => {
 
 }
 
+const getUserLocation = async() => {
+    if(navigator.geolocation){
+        alert('可以取得位置');
+    }else{
+        alert('無法取得位置');
+    }
+}
+
 </script>
 
 <template>
@@ -31,7 +39,7 @@ const getGeolocation = async () => {
                 <div class="map-function-item-response">
                     <input type="text" value="" v-model="response">
                     <textarea name="" id="" cols="30" rows="10" v-model="responseobject"></textarea>
-                    <button @click="getGeolocation">點擊獲取</button>
+                    <button @click="getUserLocation">點擊獲取</button>
                 </div>
             </div>
         </div>
