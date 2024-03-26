@@ -191,10 +191,12 @@ const createNewUser = async () => {
     try {
         await firebase.auth().createUserWithEmailAndPassword(userEmail.value, userPassword.value)
         console.log('註冊成功');
+        alert('註冊成功')
         userLogin()
     } catch (error) {
         console.log(error.message);
         console.log('註冊失敗');
+        alert('註冊失敗')
     }
 }
 const userLogin = async () => {
@@ -202,10 +204,12 @@ const userLogin = async () => {
         const res = await firebase.auth().signInWithEmailAndPassword(userEmail.value, userPassword.value)
         console.log('登入成功');
         console.log(res);
+        alert('登入成功')
         userCheck()
     } catch (error) {
         console.log(error.message);
         console.log('登入失敗');
+        alert('登入失敗')
         createNewUser()
     }
 }
@@ -242,6 +246,7 @@ const userLogout = () => {
     logoutBox.value = false
     sideToolShow.value = true
     console.log('登出成功');
+    alert('登出成功')
 }
 // 註冊登出功能
 
@@ -286,6 +291,7 @@ const addFavorite = (userid, animeid) => {
     }) //獲得當前登入使用者的資料位於數列中的索引值
     favoriteAnimeList.value.data.user[userIndex].loveanimelist.push(animeid)
     console.log(animeid + "已加入" + userid + "我的最愛中");
+    alert(animeid + "已加入我的最愛")
 }
 //加到最愛
 
@@ -297,6 +303,7 @@ const cancelFavoriteAnime = (animeid) => {
     const res = favoriteAnimeList.value.data.user[userIndex].loveanimelist.filter((item) => item != animeid)
     favoriteAnimeList.value.data.user[userIndex].loveanimelist = res
     console.log(animeid + "已刪除");
+    alert(animeid + "已刪除")
 }
 //刪除最愛
 
