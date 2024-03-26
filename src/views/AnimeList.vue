@@ -55,6 +55,18 @@ const getAnimeList = async () => {
         if (listCount.value < totalCount.value) {
             await getAnimeList()
         } else {
+            const haveImg = data.value.filter(item => {
+                return item.images.facebook.og_image_url != ""
+            })
+            const dontHaveImg = data.value.filter(item => {
+                return item.images.facebook.og_image_url == ""
+            })
+            const newData = [...haveImg, ...dontHaveImg]//展開兩個數組
+            data.value = newData
+            console.log(data.value);
+            // console.log(haveImg);
+            // console.log(dontHaveImg);
+            // console.log(haveImg.length+dontHaveImg.length);
             getAnimeStaffList()
         }
         // console.log(data.value);
@@ -352,7 +364,7 @@ const windowScrollTop = ref(0)
 
 window.addEventListener('scroll', () => {
     windowScrollTop.value = window.scrollY
-    console.log(windowScrollTop.value);
+    // console.log(windowScrollTop.value);
 })
 //判斷頁面是否滾動離開頂部功能
 
