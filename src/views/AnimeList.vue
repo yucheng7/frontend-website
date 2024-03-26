@@ -208,7 +208,7 @@ const createNewUser = async () => {
     } catch (error) {
         console.log(error.message);
         console.log('註冊失敗');
-        alert('註冊失敗')
+        alert('註冊失敗，帳號格式錯誤或密碼未達6位數規範，請重新註冊')
     }
 }
 const userLogin = async () => {
