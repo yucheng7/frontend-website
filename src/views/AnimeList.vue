@@ -1,6 +1,6 @@
 <script setup>
 import axios from 'axios'
-import { ref, setTransitionHooks } from 'vue'
+import { ref } from 'vue'
 import firebase from "firebase/compat/app";
 
 import "firebase/compat/auth"
@@ -808,7 +808,7 @@ const deleteFavoritelistItem = (animeid) => {
                                 width: 100%;
                                 flex-wrap: wrap;
                                 flex-direction: column;
-                                // box-sizing: border-box;
+                                box-sizing: border-box;
                                 overflow: auto;
                             }
 

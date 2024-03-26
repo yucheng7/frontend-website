@@ -21,12 +21,12 @@ const router = createRouter({
       //   keepAlive: false
       // },
       component: () => import('../views/AnimeList.vue')
-    }
-    // {
-    //   path: '/',
-    //   name: 'home',
-    //   component: HomeView
-    // },
+    },
+    {
+      path: '/mapproject',
+      name: 'mapproject',
+      component: () => import('../views/MapProject.vue')
+    },
     // {
     //   path: '/about',
     //   name: 'about',
