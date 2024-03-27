@@ -44,7 +44,7 @@ const getGeolocation = async () => {
 
 
 //獲取裝置地址座標
-const getUserLocation = async() => {
+const getUserLocation = async () => {
     if (navigator.geolocation) {
         alert('可以取得位置');
         navigator.geolocation.getCurrentPosition((position) => {
@@ -54,7 +54,7 @@ const getUserLocation = async() => {
                 longitude: position.coords.longitude
             }
             responseobject.value = JSON.stringify(object)
-            response.value = object 
+            response.value = object
             console.log("取得位置成功", response.value);
             addGeoLocationData(object)
             getMaps(response.value.latitude, response.value.longitude)
@@ -79,7 +79,7 @@ const addGeoLocationData = async (object) => {
     const database = getDatabase()
     set(databaseRef(database, 'data/geo'), newArray)
     console.log('新增成功');
-    
+
 }
 //新增資料
 //獲取目前的資料
@@ -151,7 +151,7 @@ const getMaps = (lat, lng) => {
     })
 }
 
-onMounted(async() => {
+onMounted(async () => {
     getGeolocation()
     getUserLocation()
 })
@@ -160,14 +160,14 @@ const markers = ref([])
 
 //獲取地圖
 const initMap = (latitude, longitude) => {
-    
+
     const map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: latitude, lng: longitude },
         zoom: 15,
-        gestureHandling: 'coorperative'
+        gestureHandling: 'greedy'
     });
     console.log(map);
-    new google.maps.Marker({
+    const marker = new google.maps.Marker({
         position: { lat: latitude, lng: longitude },
         map: map
     })
@@ -177,8 +177,10 @@ const initMap = (latitude, longitude) => {
         position: { lat: latitude, lng: longitude },
     })
     infoWindow.open(map, marker)
-    
-} 
+
+}
+
+const pageValue = ref(0) // 0 代表左頁 1 代表右頁
 
 </script>
 
@@ -186,57 +188,68 @@ const initMap = (latitude, longitude) => {
     <!-- 金鑰 AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c -->
     <div class="map">
         <div class="map-content">
+            <div class="map-title">我是標題</div>
             <div class="map-item" id="map"></div>
             <input type="text" value="" v-model="inputName">
             <div class="map-item-btn">
-                <button @click="">搜尋附近</button>
+                <button @click="pageValue = 0">搜尋附近</button>
+                <button @click="pageValue = 1">切換下頁</button>
             </div>
-            
         </div>
-        <div class="map-function">
-            <div class="map-function-item">
-                <div class="map-function-item-response">
-                    <input type="text" value="" v-model="response">
-                    <textarea name="" id="" cols="30" rows="10" v-model="responseobject"></textarea>
-                    <button @click="getDatabaseData">點擊獲取</button>
-                    <button @click="getUserLocation">點擊修改</button>
-                    <button @click="addNewGeoLocationData">點擊新增預設資料</button>
-                    <textarea name="" id="" cols="30" rows="10" v-model="saveData"></textarea>
+        <transition name="fade">
+            <div class="map-function" v-if="pageValue == 1">
+                <div class="map-function-item">
+                    <div class="map-function-item-response">
+                        <input type="text" value="" v-model="response">
+                        <textarea name="" id="" cols="30" rows="10" v-model="responseobject"></textarea>
+                        <button @click="getDatabaseData">點擊獲取</button>
+                        <button @click="getUserLocation">點擊修改</button>
+                        <button @click="addNewGeoLocationData">點擊新增預設資料</button>
+                        <textarea name="" id="" cols="30" rows="10" v-model="saveData"></textarea>
+                    </div>
                 </div>
             </div>
-        </div>
+        </transition>
+
     </div>
 </template>
 
 <style lang="scss" scoped>
 .map {
     width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+    margin: 0 auto;
 
     .map-content {
         width: 100%;
         height: 100vh;
         background-color: antiquewhite;
+
         display: flex;
-        justify-content: center;
         align-items: center;
         flex-direction: column;
+        box-sizing: border-box;
+
+        .map-title {
+            padding: 10px;
+            font-size: 30px;
+            font-weight: bold;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
         .map-item {
-            width: 80%;
-            height: 80%;
+            width: 100%;
+            max-width: 1600px;
+            height: 100%;
             background-color: gray;
             box-shadow: 0 0 5px gray;
             box-sizing: border-box;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
         }
 
         input {
+            margin: 20px;
             width: 80%;
             padding: 10px;
             font-size: 30px;
@@ -247,14 +260,18 @@ const initMap = (latitude, longitude) => {
             box-shadow: 0 0 5px gray;
             text-align: center;
             z-index: 100;
+            border-radius: 10px;
         }
 
         .map-item-btn {
             width: 80%;
-            
+
 
         }
+
     }
+
+
 
     .map-function {
         width: 100%;
@@ -280,6 +297,7 @@ const initMap = (latitude, longitude) => {
                 justify-content: center;
                 align-items: center;
                 flex-direction: column;
+
                 input,
                 textarea {
                     display: block;
@@ -310,5 +328,15 @@ const initMap = (latitude, longitude) => {
 
         }
     }
+}
+
+fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>
