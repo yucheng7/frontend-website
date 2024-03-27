@@ -774,6 +774,7 @@ const deleteFavoritelistItem = (animeid) => {
                         border-top-left-radius: 15px;
                         border-top-right-radius: 15px;
                         border: 1px solid black;
+                        z-index: 200;
                     }
 
                     .animelist-content-item-description {
