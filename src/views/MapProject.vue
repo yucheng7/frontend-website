@@ -155,6 +155,9 @@ onMounted(async() => {
     getGeolocation()
     getUserLocation()
 })
+
+const markers = ref([])
+
 //獲取地圖
 const initMap = (latitude, longitude) => {
     
@@ -164,11 +167,17 @@ const initMap = (latitude, longitude) => {
         gestureHandling: 'coorperative'
     });
     console.log(map);
-    const marker = new google.maps.Marker({
+    new google.maps.Marker({
         position: { lat: latitude, lng: longitude },
         map: map
     })
     console.log(marker);
+    const infoWindow = new google.maps.InfoWindow({
+        content: 'Hello World!',
+        position: { lat: latitude, lng: longitude },
+    })
+    infoWindow.open(map, marker)
+    
 } 
 
 </script>
@@ -265,7 +274,12 @@ const initMap = (latitude, longitude) => {
             padding: 20px;
 
             .map-function-item-response {
-
+                width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
                 input,
                 textarea {
                     display: block;
