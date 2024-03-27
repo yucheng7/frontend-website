@@ -28,6 +28,7 @@ const analytics = getAnalytics(app);
 const anotherRes = ref('')
 const response = ref({})
 const responseobject = ref('')
+const inputName = ref('')
 
 const getGeolocation = async () => {
     try {
@@ -159,7 +160,8 @@ const initMap = (latitude, longitude) => {
     
     const map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: latitude, lng: longitude },
-        zoom: 15
+        zoom: 15,
+        gestureHandling: 'coorperative'
     });
     console.log(map);
     const marker = new google.maps.Marker({
@@ -176,8 +178,11 @@ const initMap = (latitude, longitude) => {
     <div class="map">
         <div class="map-content">
             <div class="map-item" id="map"></div>
-            <input type="text" value="">
-            <button @click="searchNearby">搜尋附近</button>
+            <input type="text" value="" v-model="inputName">
+            <div class="map-item-btn">
+                <button @click="">搜尋附近</button>
+            </div>
+            
         </div>
         <div class="map-function">
             <div class="map-function-item">
@@ -186,7 +191,7 @@ const initMap = (latitude, longitude) => {
                     <textarea name="" id="" cols="30" rows="10" v-model="responseobject"></textarea>
                     <button @click="getDatabaseData">點擊獲取</button>
                     <button @click="getUserLocation">點擊修改</button>
-                    <button @click="addNewGeoLocationData">點擊新增資料</button>
+                    <button @click="addNewGeoLocationData">點擊新增預設資料</button>
                     <textarea name="" id="" cols="30" rows="10" v-model="saveData"></textarea>
                 </div>
             </div>
@@ -223,7 +228,7 @@ const initMap = (latitude, longitude) => {
         }
 
         input {
-            width: 90%;
+            width: 80%;
             padding: 10px;
             font-size: 30px;
             font-weight: bold;
@@ -232,6 +237,13 @@ const initMap = (latitude, longitude) => {
             border: none;
             box-shadow: 0 0 5px gray;
             text-align: center;
+            z-index: 100;
+        }
+
+        .map-item-btn {
+            width: 80%;
+            
+
         }
     }
 
