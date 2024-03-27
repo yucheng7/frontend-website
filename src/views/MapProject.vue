@@ -4,6 +4,8 @@ import axios from 'axios'
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics"
 import { getDatabase, ref as databaseRef, child, set, get } from "firebase/database"
+import { onMounted } from 'vue'
+import { Loader } from "@googlemaps/js-api-loader"
 
 
 //firebase初始化
@@ -23,16 +25,16 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
 //firebase初始化
-
-const response = ref('')
+const anotherRes = ref('')
+const response = ref({})
 const responseobject = ref('')
 
 const getGeolocation = async () => {
     try {
         const res = await axios.post("https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c")
         console.log(res.data)
-        response.value = res.data
-        addGeoLocationData(res.data.location)
+        anotherRes.value = res.data.location
+        // addGeoLocationData(res.data.location)
     } catch (error) {
         console.log('發生錯誤', error)
     }
@@ -41,7 +43,7 @@ const getGeolocation = async () => {
 
 
 //獲取裝置地址座標
-const getUserLocation = () => {
+const getUserLocation = async() => {
     if (navigator.geolocation) {
         alert('可以取得位置');
         navigator.geolocation.getCurrentPosition((position) => {
@@ -51,9 +53,10 @@ const getUserLocation = () => {
                 longitude: position.coords.longitude
             }
             responseobject.value = JSON.stringify(object)
-            console.log("取得位置成功", responseobject.value);
-            response.value = object.latitude, object.longitude
+            response.value = object 
+            console.log("取得位置成功", response.value);
             addGeoLocationData(object)
+            getMaps(response.value.latitude, response.value.longitude)
         })
     } else {
         alert('無法取得位置');
@@ -64,7 +67,7 @@ const getUserLocation = () => {
 
 
 //新增資料
-const addGeoLocationData = async(object) => {    
+const addGeoLocationData = async (object) => {
     const realtimeDatabase = await getDatabaseData() //獲取舊資料
     console.log(realtimeDatabase);
     const newArray = []
@@ -75,6 +78,7 @@ const addGeoLocationData = async(object) => {
     const database = getDatabase()
     set(databaseRef(database, 'data/geo'), newArray)
     console.log('新增成功');
+    
 }
 //新增資料
 //獲取目前的資料
@@ -91,12 +95,79 @@ const saveData = ref('')
 //新增預設資料
 const addNewGeoLocationData = () => {
     const database = getDatabase()
-    set(databaseRef(database, 'data/geo'), [{latitude: 25.0777864, longitude: 121.5719522}])
+    set(databaseRef(database, 'data/geo'), [{ latitude: 25.0777864, longitude: 121.5719522 }])
     console.log('新增新資料成功');
 }
 //新增預設資料
 
+const searchData = ref({
+    "languageCode": "zh-TW",
+    "regionCode": "TW",
+    "includedTypes": [
+        "american_restaurant", "bakery", "bar", "barbecue_restaurant", "brazilian_restaurant", "breakfast_restaurant", "brunch_restaurant", "cafe", "chinese_restaurant", "coffee_shop", "fast_food_restaurant", "french_restaurant", "greek_restaurant", "hamburger_restaurant", "ice_cream_shop", "indian_restaurant", "indonesian_restaurant", "italian_restaurant", "japanese_restaurant", "korean_restaurant", "lebanese_restaurant", "meal_delivery", "meal_takeaway", "mediterranean_restaurant", "mexican_restaurant", "middle_eastern_restaurant", "pizza_restaurant", "ramen_restaurant", "restaurant", "sandwich_shop", "seafood_restaurant", "spanish_restaurant", "steak_house", "sushi_restaurant", "thai_restaurant", "turkish_restaurant", "vegan_restaurant", "vegetarian_restaurant", "vietnamese_restaurant"],
+    "excludedTypes": [],
+    "includedPrimaryTypes": [],
+    "excludedPrimaryTypes": [],
+    "maxResultCount": 20,
+    "locationRestriction": {
+        "circle": {
+            "center": {
+                "latitude": 25.084782173840342,
+                "longitude": 121.56284515286235
+            },
+            "radius": 5000.0
+        }
+    },
+    "rankPreference": "DISTANCE"
+})
 
+const headers = {
+    'Content-Type': 'application/json',
+    'X-Goog-Api-Key': 'AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c',
+    'X-Goog-FieldMask': '*'
+}
+
+const searchNearby = async () => {
+    try {
+        const res = await axios.post('https://places.googleapis.com/v1/places:searchNearby', searchData.value, { headers: headers })
+        console.log('res', res.data);
+        response.value = res.data
+        console.log(res.data);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const loader = new Loader({
+    apiKey: 'AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c',
+    version: 'weekly'
+})
+//獲取地圖
+const getMaps = (lat, lng) => {
+    console.log("準備執行", lat, lng);
+    loader.load().then(() => {
+        initMap(lat, lng)
+    })
+}
+
+onMounted(async() => {
+    getGeolocation()
+    getUserLocation()
+})
+//獲取地圖
+const initMap = (latitude, longitude) => {
+    
+    const map = new google.maps.Map(document.getElementById('map'), {
+        center: { lat: latitude, lng: longitude },
+        zoom: 15
+    });
+    console.log(map);
+    const marker = new google.maps.Marker({
+        position: { lat: latitude, lng: longitude },
+        map: map
+    })
+    console.log(marker);
+} 
 
 </script>
 
@@ -104,7 +175,9 @@ const addNewGeoLocationData = () => {
     <!-- 金鑰 AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c -->
     <div class="map">
         <div class="map-content">
-            <div class="map-item"></div>
+            <div class="map-item" id="map"></div>
+            <input type="text" value="">
+            <button @click="searchNearby">搜尋附近</button>
         </div>
         <div class="map-function">
             <div class="map-function-item">
@@ -125,6 +198,10 @@ const addNewGeoLocationData = () => {
 .map {
     width: 100%;
     height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 
     .map-content {
         width: 100%;
@@ -133,11 +210,28 @@ const addNewGeoLocationData = () => {
         display: flex;
         justify-content: center;
         align-items: center;
+        flex-direction: column;
 
         .map-item {
             width: 80%;
             height: 80%;
             background-color: gray;
+            box-shadow: 0 0 5px gray;
+            box-sizing: border-box;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            font-size: 30px;
+            font-weight: bold;
+            box-sizing: border-box;
+            outline: none;
+            border: none;
+            box-shadow: 0 0 5px gray;
+            text-align: center;
         }
     }
 
@@ -150,8 +244,8 @@ const addNewGeoLocationData = () => {
         align-items: center;
 
         .map-function-item {
-            width: 500px;
-            min-height: 500px;
+            height: 80%;
+            width: 80%;
             background-color: cornflowerblue;
             display: flex;
             justify-content: center;
