@@ -134,6 +134,7 @@ const searchNearby = async () => {
         console.log('res', res.data);
         response.value = res.data
         console.log(res.data);
+        moveToPage()
     } catch (error) {
         console.log(error);
     }
@@ -141,7 +142,11 @@ const searchNearby = async () => {
 
 const loader = new Loader({
     apiKey: 'AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c',
-    version: 'weekly'
+    version: 'weekly',
+    libraries: ['places'],
+    language: 'zh-TW',
+    region: 'TW',
+
 })
 //獲取地圖
 const getMaps = (lat, lng) => {
@@ -149,6 +154,8 @@ const getMaps = (lat, lng) => {
     loader.load().then(() => {
         initMap(lat, lng)
     })
+    initMap(lat, lng)
+
 }
 
 onMounted(async () => {
@@ -161,11 +168,16 @@ const markers = ref([])
 
 //獲取地圖
 const initMap = (latitude, longitude) => {
-
+    const mapOption = {
+        // disableDefaultUI: true,
+        mapTypeControl: false,
+    }
     const map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: latitude, lng: longitude },
         zoom: 15,
-        gestureHandling: 'greedy'
+        gestureHandling: 'greedy',
+        ...mapOption,
+
     });
     console.log(map);
     const marker = new google.maps.Marker({
@@ -180,11 +192,35 @@ const initMap = (latitude, longitude) => {
     infoWindow.open(map, marker)
 
 }
+const drawMap = (obj, map) => {
+    new google.maps.Marker({
+        position: obj,
+        map: map
+    })
+    new google.maps.InfoWindow({
+        content: 'Hello by myself!',
+        position: obj,
+    }).open(map, new google.maps.Marker({
+        position: obj,
+        map: map
+    }))
+}
+
+const drawallMarkers = (map) => {
+    const data = ref([
+        {
+            lat: 25.0842907, lng: 121.5629323
+        },
+    ])
+    data.value.forEach(item => {
+        return drawMap(item, map)
+    });
+}
 
 const pageValue = ref(1) // 0 代表左頁 1 代表右頁
 const moveToPage = () => {
     const pageHeight = window.innerHeight
-    console.log(pageHeight);
+    // console.log(pageHeight);
     window.scrollTo({
         top: pageHeight * pageValue.value,
         behavior: 'smooth'
@@ -208,6 +244,15 @@ const moveToBottom = () => {
         behavior: 'smooth'
     })
 }
+const pageState = ref(0) //0 搜尋 1 結果
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 0){
+        pageState.value = 1
+    } else {
+        pageState.value = 0
+    }
+})
+
 
 </script>
 
@@ -218,9 +263,12 @@ const moveToBottom = () => {
             <div class="map-title" @click="moveToBottom">我是標題</div>
             <div class="map-item" id="map"></div>
             <input :class="{ 'active': !isActive }" type="text" value="" v-model="inputName" v-show="!isActive">
-            <div class="map-item-btn">
+            <div class="map-item-btn" v-if="pageState == 0">
                 <button @click="searchNearby">搜尋附近</button>
                 <button @click="isActive = !isActive">條件篩選</button>
+            </div>
+            <div class="map-item-btn" v-if="pageState == 1">
+                <button @click="moveToTop">返回頂部</button>
             </div>
             <div :class="{ 'selector': true, 'active': isActive, 'fadeout': !isActive }">
                 我是篩選塊
@@ -230,9 +278,9 @@ const moveToBottom = () => {
             <div class="searchData-title">500公里內搜尋結果</div>
             <div class="searchData-content">
                 <ul class="searchDate-list">
-                    <li class="searchData-list-item">
-                        <div>搜尋結果</div>
-                        <div>搜尋結果</div>
+                    <li class="searchData-list-item" v-for="item in response.places" :key="item">
+                        <div>{{ item.displayName.text }}</div>
+                        <div>{{ }}</div>
                     </li>
                     <li class="searchData-list-item">123</li>
                 </ul>
@@ -287,7 +335,7 @@ const moveToBottom = () => {
             max-width: 1200px;
             height: 100%;
             background-color: gray;
-            box-shadow: 0 5px 10px gray;
+            // box-shadow: 0 5px 10px gray;
             box-sizing: border-box;
         }
 
@@ -312,6 +360,8 @@ const moveToBottom = () => {
         .map-item-btn {
             width: 100%;
             display: flex;
+            position: fixed;
+            bottom: 0;
 
             button {
                 width: 100%;
@@ -319,18 +369,20 @@ const moveToBottom = () => {
                 font-size: 20px;
                 border: none;
                 font-weight: bold;
-                z-index: 100;
+                cursor: pointer;
             }
         }
 
         .selector {
             position: absolute;
-            width: 100%;
+            width: 90%;
             height: 70vh;
             background-color: white;
             bottom: 0;
-            // z-index: 999;
-            transition: all 0.2s ease-in
+            border-radius: 10px;
+            box-shadow: 0 0 5px gray;
+            transition: all 0.2s ease-in;
+
         }
     }
 
@@ -356,16 +408,18 @@ const moveToBottom = () => {
             box-shadow: 0 5px 5px gray;
             box-sizing: border-box;
             list-style: none;
+
             .searchDate-list {
                 width: 100%;
                 font-size: 20px;
                 background-color: white;
                 padding: 10px;
                 box-sizing: border-box;
+
                 .searchData-list-item {
                     // width: 100%;
                     padding: 10px;
-                    background-color: aquamarine;      
+                    background-color: aquamarine;
                 }
             }
         }
@@ -444,6 +498,7 @@ const moveToBottom = () => {
 
 .active {
     opacity: 1;
+    transform: translateY(-10vh);
 }
 
 .fadeout {
