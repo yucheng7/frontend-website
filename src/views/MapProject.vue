@@ -152,8 +152,9 @@ const getMaps = (lat, lng) => {
 }
 
 onMounted(async () => {
-    getGeolocation()
-    getUserLocation()
+    await getGeolocation()
+    // getUserLocation()
+    getMaps(anotherRes.value.lat, anotherRes.value.lng)
 })
 
 const markers = ref([])
@@ -207,6 +208,11 @@ const moveToBottom = () => {
         behavior: 'smooth'
     })
 }
+
+window.scrollTo({
+        top: 80,
+        behavior: 'smooth'
+    })
 </script>
 
 <template>
@@ -310,8 +316,6 @@ const moveToBottom = () => {
         .map-item-btn {
             width: 100%;
             display: flex;
-            justify-content: space-around;
-            align-items: center;
 
             button {
                 width: 100%;
