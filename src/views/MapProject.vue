@@ -209,10 +209,6 @@ const moveToBottom = () => {
     })
 }
 
-window.scrollTo({
-        top: 80,
-        behavior: 'smooth'
-    })
 </script>
 
 <template>
