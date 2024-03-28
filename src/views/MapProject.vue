@@ -180,36 +180,75 @@ const initMap = (latitude, longitude) => {
 
 }
 
-const pageValue = ref(0) // 0 代表左頁 1 代表右頁
+const pageValue = ref(1) // 0 代表左頁 1 代表右頁
+const moveToPage = () => {
+    const pageHeight = window.innerHeight
+    console.log(pageHeight);
+    window.scrollTo({
+        top: pageHeight * pageValue.value,
+        behavior: 'smooth'
+    }) // window.scrollTo
 
+}
+
+const moveToTop = () => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    }) // window.scrollTo
+}
+
+const isActive = ref(false)
+
+const moveToBottom = () => {
+    const pageHeight = window.innerHeight
+    window.scrollTo({
+        top: pageHeight * 2,
+        behavior: 'smooth'
+    })
+}
 </script>
 
 <template>
     <!-- 金鑰 AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c -->
     <div class="map">
         <div class="map-content">
-            <div class="map-title">我是標題</div>
+            <div class="map-title" @click="moveToBottom">我是標題</div>
             <div class="map-item" id="map"></div>
-            <input type="text" value="" v-model="inputName">
+            <input :class="{ 'active': !isActive }" type="text" value="" v-model="inputName" v-show="!isActive">
             <div class="map-item-btn">
-                <button @click="pageValue = 0">搜尋附近</button>
-                <button @click="pageValue = 1">切換下頁</button>
+                <button @click="searchNearby">搜尋附近</button>
+                <button @click="isActive = !isActive">條件篩選</button>
+            </div>
+            <div :class="{ 'selector': true, 'active': isActive, 'fadeout': !isActive }">
+                我是篩選塊
             </div>
         </div>
-        <transition name="fade">
-            <div class="map-function" v-if="pageValue == 1">
-                <div class="map-function-item">
-                    <div class="map-function-item-response">
-                        <input type="text" value="" v-model="response">
-                        <textarea name="" id="" cols="30" rows="10" v-model="responseobject"></textarea>
-                        <button @click="getDatabaseData">點擊獲取</button>
-                        <button @click="getUserLocation">點擊修改</button>
-                        <button @click="addNewGeoLocationData">點擊新增預設資料</button>
-                        <textarea name="" id="" cols="30" rows="10" v-model="saveData"></textarea>
-                    </div>
+        <div class="searchData">
+            <div class="searchData-title">500公里內搜尋結果</div>
+            <div class="searchData-content">
+                <ul class="searchDate-list">
+                    <li class="searchData-list-item">
+                        <div>搜尋結果</div>
+                        <div>搜尋結果</div>
+                    </li>
+                    <li class="searchData-list-item">123</li>
+                </ul>
+            </div>
+        </div>
+        <div class="map-function">
+            <div class="map-function-item">
+                <div class="map-function-item-response">
+                    <input type="text" value="" v-model="response">
+                    <textarea name="" id="" cols="30" rows="10" v-model="responseobject"></textarea>
+                    <button @click="getDatabaseData">點擊獲取</button>
+                    <button @click="getUserLocation">點擊修改</button>
+                    <button @click="addNewGeoLocationData">點擊新增預設資料</button>
+                    <textarea name="" id="" cols="30" rows="10" v-model="saveData"></textarea>
+                    <button @click="moveToTop">點擊回頂</button>
                 </div>
             </div>
-        </transition>
+        </div>
 
     </div>
 </template>
@@ -218,6 +257,7 @@ const pageValue = ref(0) // 0 代表左頁 1 代表右頁
 .map {
     width: 100%;
     margin: 0 auto;
+    position: relative;
 
     .map-content {
         width: 100%;
@@ -228,6 +268,7 @@ const pageValue = ref(0) // 0 代表左頁 1 代表右頁
         align-items: center;
         flex-direction: column;
         box-sizing: border-box;
+        position: relative;
 
         .map-title {
             padding: 10px;
@@ -241,16 +282,19 @@ const pageValue = ref(0) // 0 代表左頁 1 代表右頁
 
         .map-item {
             width: 100%;
-            max-width: 1600px;
+            max-width: 1200px;
             height: 100%;
             background-color: gray;
-            box-shadow: 0 0 5px gray;
+            box-shadow: 0 5px 10px gray;
             box-sizing: border-box;
         }
 
         input {
+            position: absolute;
+            bottom: 10vh;
             margin: 20px;
             width: 80%;
+            max-width: 600px;
             padding: 10px;
             font-size: 30px;
             font-weight: bold;
@@ -264,14 +308,70 @@ const pageValue = ref(0) // 0 代表左頁 1 代表右頁
         }
 
         .map-item-btn {
-            width: 80%;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
 
-
+            button {
+                width: 100%;
+                padding: 10px;
+                font-size: 20px;
+                border: none;
+                font-weight: bold;
+                z-index: 100;
+            }
         }
 
+        .selector {
+            position: absolute;
+            width: 100%;
+            height: 70vh;
+            background-color: white;
+            bottom: 0;
+            // z-index: 999;
+            transition: all 0.2s ease-in
+        }
     }
 
+    .searchData {
+        width: 100%;
+        height: 100vh;
+        background-color: antiquewhite;
 
+        .searchData-title {
+            padding: 10px;
+            font-size: 30px;
+            font-weight: bold;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .searchData-content {
+            width: 100%;
+            height: 100%;
+            background-color: lightgoldenrodyellow;
+            box-shadow: 0 5px 5px gray;
+            box-sizing: border-box;
+            list-style: none;
+            .searchDate-list {
+                width: 100%;
+                font-size: 20px;
+                background-color: white;
+                padding: 10px;
+                box-sizing: border-box;
+                .searchData-list-item {
+                    // width: 100%;
+                    padding: 10px;
+                    background-color: aquamarine;      
+                }
+            }
+        }
+
+
+    }
 
     .map-function {
         width: 100%;
@@ -328,9 +428,11 @@ const pageValue = ref(0) // 0 代表左頁 1 代表右頁
 
         }
     }
+
+
 }
 
-fade-enter-active,
+.fade-enter-active,
 .fade-leave-active {
     transition: opacity 0.5s ease;
 }
@@ -338,5 +440,14 @@ fade-enter-active,
 .fade-enter-from,
 .fade-leave-to {
     opacity: 0;
+}
+
+.active {
+    opacity: 1;
+}
+
+.fadeout {
+    opacity: 0;
+    z-index: -1;
 }
 </style>
