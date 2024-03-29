@@ -30,6 +30,7 @@ const response = ref({})
 const responseobject = ref('')
 const inputName = ref('')
 
+//WIFI或網路獲取裝置位置
 const getGeolocation = async () => {
     try {
         const res = await axios.post("https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c")
@@ -41,6 +42,8 @@ const getGeolocation = async () => {
     }
 
 }
+//WIFI或網路獲取裝置位置
+
 
 
 //獲取裝置地址座標
@@ -101,25 +104,26 @@ const addNewGeoLocationData = () => {
 }
 //新增預設資料
 
+//獲取附近的餐廳
 const searchData = ref({
-    "languageCode": "zh-TW",
-    "regionCode": "TW",
-    "includedTypes": [
+    languageCode: "zh-TW",
+    regionCode: "TW",
+    includedTypes: [
         "american_restaurant", "bakery", "bar", "barbecue_restaurant", "brazilian_restaurant", "breakfast_restaurant", "brunch_restaurant", "cafe", "chinese_restaurant", "coffee_shop", "fast_food_restaurant", "french_restaurant", "greek_restaurant", "hamburger_restaurant", "ice_cream_shop", "indian_restaurant", "indonesian_restaurant", "italian_restaurant", "japanese_restaurant", "korean_restaurant", "lebanese_restaurant", "meal_delivery", "meal_takeaway", "mediterranean_restaurant", "mexican_restaurant", "middle_eastern_restaurant", "pizza_restaurant", "ramen_restaurant", "restaurant", "sandwich_shop", "seafood_restaurant", "spanish_restaurant", "steak_house", "sushi_restaurant", "thai_restaurant", "turkish_restaurant", "vegan_restaurant", "vegetarian_restaurant", "vietnamese_restaurant"],
-    "excludedTypes": [],
-    "includedPrimaryTypes": [],
-    "excludedPrimaryTypes": [],
-    "maxResultCount": 20,
-    "locationRestriction": {
-        "circle": {
-            "center": {
-                "latitude": 25.084782173840342,
-                "longitude": 121.56284515286235
+    excludedTypes: [],
+    includedPrimaryTypes: [],
+    excludedPrimaryTypes: [],
+    maxResultCount: 20,
+    locationRestriction: {
+        circle: {
+            center: {
+                latitude: 25.084782173840342,
+                longitude: 121.56284515286235
             },
-            "radius": 5000.0
+            radius: 5000.0
         }
     },
-    "rankPreference": "DISTANCE"
+    rankPreference: "DISTANCE"
 })
 
 const headers = {
@@ -127,19 +131,25 @@ const headers = {
     'X-Goog-Api-Key': 'AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c',
     'X-Goog-FieldMask': '*'
 }
-
+const nearbydata = ref('')
 const searchNearby = async () => {
     try {
+        searchData.value.locationRestriction.circle.center = response.value
         const res = await axios.post('https://places.googleapis.com/v1/places:searchNearby', searchData.value, { headers: headers })
         console.log('res', res.data);
-        response.value = res.data
-        console.log(res.data);
-        moveToPage()
+        nearbydata.value = res.data
+        console.log(res.data.places[0].currentOpeningHours.openNow);
+        getMaps(response.value.latitude, response.value.longitude)
+        // moveToPage()
     } catch (error) {
         console.log(error);
     }
 }
 
+//獲取附近的餐廳
+
+
+//獲取地圖
 const loader = new Loader({
     apiKey: 'AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c',
     version: 'weekly',
@@ -148,7 +158,6 @@ const loader = new Loader({
     region: 'TW',
 
 })
-//獲取地圖
 const getMaps = (lat, lng) => {
     console.log("準備執行", lat, lng);
     loader.load().then(() => {
@@ -159,9 +168,9 @@ const getMaps = (lat, lng) => {
 }
 
 onMounted(async () => {
-    await getGeolocation()
+    // await getGeolocation()
     // getUserLocation()
-    getMaps(anotherRes.value.lat, anotherRes.value.lng)
+    // getMaps(response.value.latitude, response.value.longitude)
 })
 
 const markers = ref([])
@@ -174,7 +183,7 @@ const initMap = (latitude, longitude) => {
     }
     const map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: latitude, lng: longitude },
-        zoom: 15,
+        zoom: 17,
         gestureHandling: 'greedy',
         ...mapOption,
 
@@ -190,28 +199,36 @@ const initMap = (latitude, longitude) => {
         position: { lat: latitude, lng: longitude },
     })
     infoWindow.open(map, marker)
-
+    drawallMarkers(map)
 }
-const drawMap = (obj, map) => {
+const drawMap = (item, map) => {
+    console.log("執行開始", item);
     new google.maps.Marker({
-        position: obj,
+        position: item.location,
         map: map
     })
     new google.maps.InfoWindow({
-        content: 'Hello by myself!',
-        position: obj,
+        content: item.content,
+        position: item.location,
     }).open(map, new google.maps.Marker({
-        position: obj,
+        position: item.location,
         map: map
     }))
+    
+    console.log("執行結束");
 }
 
 const drawallMarkers = (map) => {
-    const data = ref([
-        {
-            lat: 25.0842907, lng: 121.5629323
-        },
-    ])
+    console.log("執行開始");
+    const data = ref([])
+    nearbydata.value.places.forEach(item => {
+        data.value.push({
+            location: {
+                lat: item.location.latitude, lng: item.location.longitude
+            },
+            content: item.displayName.text
+        })
+    })
     data.value.forEach(item => {
         return drawMap(item, map)
     });
@@ -246,7 +263,7 @@ const moveToBottom = () => {
 }
 const pageState = ref(0) //0 搜尋 1 結果
 window.addEventListener('scroll', () => {
-    if (window.scrollY > 0){
+    if (window.scrollY > 0) {
         pageState.value = 1
     } else {
         pageState.value = 0
@@ -264,7 +281,7 @@ window.addEventListener('scroll', () => {
             <div class="map-item" id="map"></div>
             <input :class="{ 'active': !isActive }" type="text" value="" v-model="inputName" v-show="!isActive">
             <div class="map-item-btn" v-if="pageState == 0">
-                <button @click="searchNearby">搜尋附近</button>
+                <button @click="">搜尋附近</button>
                 <button @click="isActive = !isActive">條件篩選</button>
             </div>
             <div class="map-item-btn" v-if="pageState == 1">
@@ -274,16 +291,16 @@ window.addEventListener('scroll', () => {
                 我是篩選塊
             </div>
         </div>
-        <div class="searchData">
-            <div class="searchData-title">500公里內搜尋結果</div>
+        <div class="searchData" style="display: none">
+            <div class="searchData-title">500公里內20筆搜尋結果</div>
             <div class="searchData-content">
                 <ul class="searchDate-list">
                     <li class="searchData-list-item" v-for="item in response.places" :key="item">
                         <div>{{ item.displayName.text }}</div>
-                        <div>{{ }}</div>
+                        <img src="" alt="" srcset="">
                     </li>
-                    <li class="searchData-list-item">123</li>
                 </ul>
+
             </div>
         </div>
         <div class="map-function">
@@ -388,7 +405,7 @@ window.addEventListener('scroll', () => {
 
     .searchData {
         width: 100%;
-        height: 100vh;
+        height: 100%;
         background-color: antiquewhite;
 
         .searchData-title {
@@ -407,19 +424,27 @@ window.addEventListener('scroll', () => {
             background-color: lightgoldenrodyellow;
             box-shadow: 0 5px 5px gray;
             box-sizing: border-box;
-            list-style: none;
+
 
             .searchDate-list {
-                width: 100%;
+                width: 100vw;
+                height: 100%;
+                list-style: none;
                 font-size: 20px;
-                background-color: white;
                 padding: 10px;
+                background-color: white;
                 box-sizing: border-box;
 
                 .searchData-list-item {
                     // width: 100%;
                     padding: 10px;
-                    background-color: aquamarine;
+                    // background-color: aquamarine;
+                    box-shadow: 0 0 5px black;
+                    box-sizing: border-box;
+                    margin-bottom: 10px;
+                    text-align: center;
+                    border-radius: 10px;
+                    font-weight: bold;
                 }
             }
         }
