@@ -69,7 +69,6 @@ const getUserLocation = async () => {
 }
 //獲取裝置地址座標
 
-
 //新增資料
 const addGeoLocationData = async (object) => {
     const realtimeDatabase = await getDatabaseData() //獲取舊資料
@@ -80,7 +79,7 @@ const addGeoLocationData = async (object) => {
     newArray.push(object)//push新資料
     console.log(newArray);
     const database = getDatabase()
-    set(databaseRef(database, 'data/geo'), newArray)
+    await set(databaseRef(database, 'data/geo'), newArray)
     console.log('新增成功');
 
 }

@@ -2,7 +2,7 @@
 import axios from 'axios'
 import { ref } from 'vue'
 import firebase from "firebase/compat/app";
-
+import { getDatabase, ref as databaseRef, child, set, get, push } from "firebase/database"
 import "firebase/compat/auth"
 
 //配置firebase
@@ -49,7 +49,7 @@ const getAnimeList = async () => {
         totalCount.value = res.data.total_count
         data.value.push(...res.data.works)
 
-        // console.log(res.data.works.media_text)
+        // console.log(res)
         listCount.value += 50
         page.value++
         if (listCount.value < totalCount.value) {
@@ -63,7 +63,7 @@ const getAnimeList = async () => {
             })
             const newData = [...haveImg, ...dontHaveImg]//展開兩個數組
             data.value = newData
-            console.log(data.value);
+            // console.log(data.value);
             // console.log(haveImg);
             // console.log(dontHaveImg);
             // console.log(haveImg.length+dontHaveImg.length);
@@ -97,7 +97,8 @@ const seasonChineseChange = () => {
     }
 }
 
-const handleYearChange = () => {
+const handleYearChange = async () => {
+    // changeLoadingState()//開始載入
     resetAnimeList()
     getAnimeList()
     seasonChineseChange()
@@ -188,9 +189,11 @@ const handleClickFavoritePageType = () => {
     pageType.value = 2
 }
 //切換動漫搜尋方式
+
 //側邊工具列顯示
 const sideToolShow = ref(true)
 //側邊工具列顯示
+
 // 註冊登入功能
 const userEmail = ref('aa102133395@gmail.com')
 const userPassword = ref('123456')
@@ -226,22 +229,28 @@ const userLogin = async () => {
     }
 }
 
-const userCheck = () => {
+const userCheck = async () => {
     const user = firebase.auth().currentUser
     if (user) {
         console.log('已登入')
         console.log(user.uid);
         userUid.value = user.uid
         loginUser.value = userEmail.value
-        favoriteAnimeList.value.data.user.push({
-            email: userEmail.value,
-            uid: userUid.value,
-            loveanimelist: []
-        })
+        const userData = {
+            email: loginUser.value,
+            uid: userUid.value
+        }
         loginBox.value = false
         userState.value = true
         sideToolShow.value = true
-
+        if (!favoriteAnimeList.value.data.user.some((item) => item.uid == userUid.value)) {
+            favoriteAnimeList.value.data.user.push({
+                email: userEmail.value,
+                uid: userUid.value,
+                loveanimelist: []
+            })//暫時新增資料
+        }
+        await addDatabasedata(userData)
     }
 }
 
@@ -259,6 +268,7 @@ const userLogout = () => {
     sideToolShow.value = true
     console.log('登出成功');
     alert('登出成功')
+    pageType.value = 0
 }
 // 註冊登出功能
 
@@ -284,18 +294,12 @@ const favoriteAnimeList = ref({
             {
                 email: "aa102133395@gmail.com",
                 uid: "bd9nhZ68dIdfJg52hgeWv4L7uG33",
-                loveanimelist: [12811, 12795, 12598, 11111, 12111, 12311, 12341, 12345],
-            },
-            {
-                email: "aa3askpdofkpas58@gmail.com",
-                uid: "dafsdsfdsa52h8464684L7uG44",
                 loveanimelist: [],
-                // 假資料2
-            }
+            },
         ]
     }
 })
-console.log(favoriteAnimeList.value.data.user[0].loveanimelist);
+// console.log(favoriteAnimeList.value.data.user[0].loveanimelist);
 // const favoriteAnimeList = ref([])
 const addFavorite = (userid, animeid) => {
     const userIndex = favoriteAnimeList.value.data.user.findIndex((item) => {
@@ -353,7 +357,7 @@ const getFavoriteList = () => {
     loginUserFavoriteListId.value.forEach(async (item) => {
         const res = await axios.get(`https://api.annict.com/v1/works?access_token=C23CjuV8eGIYLnn0qRkUUhDTWdl6KFwuS-ZzzTy9IB0&filter_ids=${item}`)
         loginUserFavoriteList.value.push(...res.data.works)
-        console.log(loginUserFavoriteList.value);
+        // console.log(loginUserFavoriteList.value);
     })
 
 }//獲取目前登入使用者最愛列表索引
@@ -374,6 +378,103 @@ const deleteFavoritelistItem = (animeid) => {
     getFavoriteList()
 }
 //我的最愛列表-刪除我的最愛項目
+
+//載入畫面
+const isloading = ref(false)
+
+const changeLoadingState = () => {
+    isloading.value = !isloading.value
+    console.log("執行");
+}
+//載入畫面
+
+const getDatabaseData = async () => {
+    const database = getDatabase()
+    const snapshot = await get(databaseRef(database, 'data'))
+    console.log(snapshot.val());
+    set(databaseRef(database, 'data/user'), [
+        {
+            email: "aa102133395@gmail.com",
+            uid: "bd9nhZ68dIdfJg52hgeWv4L7uG33",
+            loveanimelist: [],
+        }
+    ])
+}
+
+const checkDatabaseData = async (data) => {
+    const database = getDatabase()
+    const snapshot = await get(databaseRef(database, 'data'))
+    console.log(snapshot.val().user);
+    if (snapshot.val().user) {
+
+        console.log("回傳true");
+        return true
+    } else {
+
+        console.log("回傳false");
+        return false
+
+    }
+}
+
+const addDatabasedata = async (data) => {
+    const database = getDatabase()
+    const snapshot = await get(databaseRef(database, 'data'))
+    console.log(snapshot.val());
+    if (await checkDatabaseData(data.uid) == false) {
+        console.log('未有使用者資料庫');
+        await set(databaseRef(database, 'data'), {
+            user: [
+                {
+                    email: data.email,
+                    uid: data.uid,
+                    loveanimelist: []
+                }
+            ]
+        })
+        console.log('新增使用者資料庫成功');
+    } else {
+        console.log('有使用者資料庫');
+        console.log(typeof snapshot.val().user);
+        const userDataList = snapshot.val().user
+        console.log(userDataList);
+        const res = userDataList.some(item => item.uid == data.uid)
+        console.log('結果是:' + res);
+        if (res) {
+            console.log('已有此使用者存在');
+        } else {
+            userDataList.push(data)
+            await set(databaseRef(database, 'data/user'), userDataList)
+            console.log('新增使用者資料成功');
+        }
+
+    }
+
+}
+//預設用資料
+const addDefaultData = async () => {
+    const database = getDatabase()
+    const snapshot = await get(databaseRef(database, 'data'))
+    console.log(snapshot.val());
+    await set(databaseRef(database, '/'), {
+        data: {
+            user: [
+                {
+                    email: "aa104684684@gmail.com",
+                    uid: "64646nhZ68d46464564646G33",
+                    loveanimelist: [],
+                },
+                {
+                    email: "aa104684sfd@gmail.com",
+                    uid: "64646nsdff464564646G33",
+                    loveanimelist: [],
+                }
+            ]
+        }
+    })
+}
+// addDefaultData()
+//預設用資料
 
 </script>
 
@@ -446,6 +547,7 @@ const deleteFavoritelistItem = (animeid) => {
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </transition>
@@ -484,6 +586,29 @@ const deleteFavoritelistItem = (animeid) => {
                                         官網:{{ item.official_site_url }}</div>
                                     <div class="animelist-content-item-description-data-seasonnametext">
                                         季度:{{ item.season_name_text }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="animelist-content-group" v-if="isloading">
+                        <div :class="{ 'animelist-content-item': true }" v-for="(item, i) in 2" :key="i">
+                            <div class="animelist-content-item-title">
+                                <div class="animelist-content-item-title-name">{{ "標題名稱" }}
+                                </div>
+                            </div>
+                            <div class="animelist-content-item-description">
+                                <div class="animelist-content-item-description-img">
+                                    <a href="">
+                                        <img src="" alt="" srcset="">
+                                    </a>
+                                </div>
+                                <div class="animelist-content-item-description-data">
+                                    <div class="animelist-content-item-description-data-mediatext">類型:{{ "TV" }}
+                                    </div>
+                                    <div class="animelist-content-item-description-data-officialsiteurl">
+                                        官網:{{ "官網網址" }}</div>
+                                    <div class="animelist-content-item-description-data-seasonnametext">
+                                        季度:{{ "季度" }}</div>
                                 </div>
                             </div>
                         </div>
@@ -587,6 +712,7 @@ const deleteFavoritelistItem = (animeid) => {
 
         </div>
     </div>
+
 </template>
 
 <style scoped lang="scss">
@@ -637,11 +763,12 @@ const deleteFavoritelistItem = (animeid) => {
                         // border-right: 1px solid black;
                         box-sizing: border-box;
                         padding: 20px;
+                        transition: all 0.2s ease-in-out;
 
                         &:hover {
                             background-color: lightgray;
                             color: white;
-                            font-size: 25px;
+                            font-size: 30px;
                             font-weight: bolder;
                         }
                     }
@@ -657,11 +784,12 @@ const deleteFavoritelistItem = (animeid) => {
                         // border-right: 1px solid black;
                         padding: 20px;
                         box-sizing: border-box;
+                        transition: all 0.2s ease-in-out;
 
                         &:hover {
                             background-color: lightgray;
                             color: white;
-                            font-size: 25px;
+                            font-size: 30px;
                             font-weight: bolder;
                         }
                     }
@@ -745,7 +873,7 @@ const deleteFavoritelistItem = (animeid) => {
             }
 
             .animelist-content {
-                width: 100%;
+                max-width: 100%;
                 box-sizing: border-box;
 
                 .animelist-content-title {
@@ -755,113 +883,118 @@ const deleteFavoritelistItem = (animeid) => {
                     width: 100%;
                 }
 
-                .animelist-content-item {
+                .animelist-content-group {
                     width: 100%;
-                    padding: 0 20px 20px;
-                    box-sizing: border-box;
+                    height: 100%;
 
-                    .animelist-content-item-title {
+
+                    .animelist-content-item {
                         width: 100%;
-                        font-size: clamp(16px, 3vw, 25px);
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
+                        padding: 0 20px 20px;
                         box-sizing: border-box;
-                        background-color: black;
-                        color: white;
-                        padding: 10px;
-                        box-shadow: 0 0 5px black;
-                        border-top-left-radius: 15px;
-                        border-top-right-radius: 15px;
-                        border: 1px solid black;
-                        z-index: 200;
-                    }
+                        // position: relative;
+                        transition: all 0.25s ease-in-out;
 
-                    .animelist-content-item-description {
-                        width: 100%;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        flex-wrap: wrap;
-                        // border: 1px solid black;
-                        box-sizing: border-box;
-                        position: relative;
-                        border-bottom-left-radius: 15px;
-                        border-bottom-right-radius: 15px;
-                        box-shadow: 0 0 5px black;
 
-                        .animelist-content-item-description-data {
+
+                        .animelist-content-item-title {
                             width: 100%;
-                            padding: 10px;
-                            font-size: clamp(16px, 3vw, 20px);
-                            box-sizing: border-box;
-                            display: flex;
-                            justify-content: space-evenly;
-                            align-items: center;
-
-                            // flex-wrap: wrap;
-                            .animelist-content-item-description-data-mediatext,
-                            .animelist-content-item-description-data-officialsiteurl,
-                            .animelist-content-item-description-data-seasonnametext {
-                                display: flex;
-                                justify-content: center;
-                                align-items: center;
-                                width: 100%;
-                                flex-wrap: wrap;
-                                flex-direction: column;
-                                box-sizing: border-box;
-                                overflow: auto;
-                            }
-
-                        }
-
-                        .animelist-content-item-description-img {
-                            min-height: 100px;
+                            font-size: clamp(16px, 3vw, 25px);
                             display: flex;
                             justify-content: center;
                             align-items: center;
                             box-sizing: border-box;
+                            background-color: black;
+                            color: white;
+                            padding: 10px;
+                            box-shadow: 0 0 5px black;
+                            border-top-left-radius: 15px;
+                            border-top-right-radius: 15px;
+                            border: 1px solid black;
+                        }
 
-                            img {
+                        .animelist-content-item-description {
+                            width: 100%;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            flex-wrap: wrap;
+                            // border: 1px solid black;
+                            box-sizing: border-box;
+                            position: relative;
+                            border-bottom-left-radius: 15px;
+                            border-bottom-right-radius: 15px;
+                            box-shadow: 0 0 5px black;
+
+                            .animelist-content-item-description-data {
                                 width: 100%;
+                                padding: 10px;
+                                font-size: clamp(16px, 3vw, 20px);
                                 box-sizing: border-box;
+                                display: flex;
+
+                                // flex-wrap: wrap;
+                                .animelist-content-item-description-data-mediatext,
+                                .animelist-content-item-description-data-officialsiteurl,
+                                .animelist-content-item-description-data-seasonnametext {
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    width: 100%;
+                                    box-sizing: border-box;
+                                }
+
                             }
 
-                            .animelist-content-item-description-img-favorite {
-                                position: absolute;
-                                top: 20px;
-                                right: 20px;
-                                background-color: white;
-                                width: 100px;
+                            .animelist-content-item-description-img {
+                                min-height: 100px;
                                 display: flex;
                                 justify-content: center;
                                 align-items: center;
-                                height: 50px;
                                 box-sizing: border-box;
-                                transition: all 0.2s linear;
-                                color: red;
-                                font-weight: bold;
-                                border-radius: 25px;
-                                border: 1px solid red;
 
-                                &:hover {
-                                    cursor: pointer;
-                                    background-color: red;
+                                img {
+                                    width: 100%;
                                     box-sizing: border-box;
-                                    color: white;
-                                    font-weight: bold;
                                 }
 
-                                &:active {
-                                    scale: 0.95;
+                                .animelist-content-item-description-img-favorite {
+                                    position: absolute;
+                                    top: 20px;
+                                    right: 20px;
+                                    background-color: white;
+                                    width: 100px;
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    height: 50px;
+                                    box-sizing: border-box;
+                                    transition: all 0.2s linear;
+                                    color: red;
+                                    font-weight: bold;
+                                    border-radius: 25px;
+                                    border: 1px solid red;
+
+                                    &:hover {
+                                        cursor: pointer;
+                                        background-color: red;
+                                        box-sizing: border-box;
+                                        color: white;
+                                        font-weight: bold;
+                                    }
+
+                                    &:active {
+                                        scale: 0.95;
+                                    }
                                 }
                             }
                         }
+
+                        &:last-child {
+                            margin-bottom: 50px;
+                        }
                     }
 
-                    &:last-child {
-                        margin-bottom: 50px;
-                    }
                 }
             }
 
@@ -1285,8 +1418,6 @@ const deleteFavoritelistItem = (animeid) => {
                         // border-right: 1px solid black;
                         box-sizing: border-box;
                         padding: 20px;
-
-
                     }
 
                     .animelist-search-switch-name {
@@ -1384,107 +1515,113 @@ const deleteFavoritelistItem = (animeid) => {
                     width: 100%;
                 }
 
-                .animelist-content-item {
+                .animelist-content-group {
                     width: 100%;
-                    padding: 0 20px 20px;
-                    box-sizing: border-box;
+                    height: 100%;
 
-                    .animelist-content-item-title {
+                    .animelist-content-item {
                         width: 100%;
-                        font-size: clamp(16px, 3vw, 25px);
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
+                        padding: 0 20px 20px;
                         box-sizing: border-box;
-                        background-color: black;
-                        color: white;
-                        padding: 10px;
-                        box-shadow: 0 0 5px black;
-                        border-top-left-radius: 15px;
-                        border-top-right-radius: 15px;
-                        border: 1px solid black;
-                    }
 
-                    .animelist-content-item-description {
-                        width: 100%;
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        flex-wrap: wrap;
-                        // border: 1px solid black;
-                        box-sizing: border-box;
-                        position: relative;
-                        border-bottom-left-radius: 15px;
-                        border-bottom-right-radius: 15px;
-                        box-shadow: 0 0 5px black;
-
-                        .animelist-content-item-description-data {
+                        .animelist-content-item-title {
                             width: 100%;
-                            padding: 10px;
-                            font-size: clamp(16px, 3vw, 20px);
-                            box-sizing: border-box;
-                            display: flex;
-                            justify-content: space-evenly;
-                            align-items: center;
-
-                            // flex-wrap: wrap;
-                            .animelist-content-item-description-data-mediatext,
-                            .animelist-content-item-description-data-officialsiteurl,
-                            .animelist-content-item-description-data-seasonnametext {
-                                display: flex;
-                                justify-content: center;
-                                align-items: center;
-                                width: 100%;
-                                flex-wrap: wrap;
-                                flex-direction: column;
-                                // box-sizing: border-box;
-                                overflow: auto;
-                            }
-
-                        }
-
-                        .animelist-content-item-description-img {
-                            min-height: 100px;
+                            font-size: clamp(16px, 3vw, 25px);
                             display: flex;
                             justify-content: center;
                             align-items: center;
                             box-sizing: border-box;
+                            background-color: black;
+                            color: white;
+                            padding: 10px;
+                            box-shadow: 0 0 5px black;
+                            border-top-left-radius: 15px;
+                            border-top-right-radius: 15px;
+                            border: 1px solid black;
+                        }
 
-                            img {
+                        .animelist-content-item-description {
+                            width: 100%;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            flex-wrap: wrap;
+                            // border: 1px solid black;
+                            box-sizing: border-box;
+                            position: relative;
+                            border-bottom-left-radius: 15px;
+                            border-bottom-right-radius: 15px;
+                            box-shadow: 0 0 5px black;
+
+                            .animelist-content-item-description-data {
                                 width: 100%;
+                                padding: 10px;
+                                font-size: clamp(16px, 3vw, 20px);
                                 box-sizing: border-box;
+                                display: flex;
+                                justify-content: space-evenly;
+                                align-items: center;
+
+                                // flex-wrap: wrap;
+                                .animelist-content-item-description-data-mediatext,
+                                .animelist-content-item-description-data-officialsiteurl,
+                                .animelist-content-item-description-data-seasonnametext {
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    width: 100%;
+                                    flex-wrap: wrap;
+                                    flex-direction: column;
+                                    // box-sizing: border-box;
+                                    overflow: auto;
+                                }
+
                             }
 
-                            .animelist-content-item-description-img-favorite {
-                                position: absolute;
-                                top: 20px;
-                                right: 20px;
-                                background-color: white;
-                                width: 100px;
+                            .animelist-content-item-description-img {
+                                min-height: 100px;
                                 display: flex;
                                 justify-content: center;
                                 align-items: center;
-                                height: 50px;
                                 box-sizing: border-box;
-                                transition: all 0.2s linear;
-                                color: red;
-                                font-weight: bold;
-                                border-radius: 25px;
-                                border: 1px solid red;
+
+                                img {
+                                    width: 100%;
+                                    box-sizing: border-box;
+                                }
+
+                                .animelist-content-item-description-img-favorite {
+                                    position: absolute;
+                                    top: 20px;
+                                    right: 20px;
+                                    background-color: white;
+                                    width: 100px;
+                                    display: flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    height: 50px;
+                                    box-sizing: border-box;
+                                    transition: all 0.2s linear;
+                                    color: red;
+                                    font-weight: bold;
+                                    border-radius: 25px;
+                                    border: 1px solid red;
 
 
 
-                                &:active {
-                                    scale: 0.95;
+                                    &:active {
+                                        scale: 0.95;
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    &:last-child {
-                        margin-bottom: 50px;
+                        &:last-child {
+                            margin-bottom: 50px;
+                        }
                     }
                 }
+
             }
 
             .animelist-favoritelist {
@@ -1826,7 +1963,20 @@ const deleteFavoritelistItem = (animeid) => {
     }
 }
 
+#animelist-loading {
+    z-index: 200;
+}
 
+.loading {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+}
 
 .fade-enter-active,
 .fade-leave-active {
@@ -1850,7 +2000,7 @@ const deleteFavoritelistItem = (animeid) => {
 
 .highlight {
     color: white;
-    font-size: 25px;
+    font-size: 30px;
     font-weight: bolder;
     transition: all 0.2s ease-in;
     background-color: black;

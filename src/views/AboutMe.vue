@@ -51,7 +51,7 @@
                     <div class="webscreenshot_item">
                         <div class="screenshot">
                             <router-link to="/animelist" class="transition-link">
-                                <img src="..\assets\img2.png" alt="">
+                                <img src="..\assets\img1.png" alt="">
                             </router-link>
                         </div>
                         <div class="usetech-description">Animelist</div>
@@ -59,9 +59,9 @@
                 </div>
                 <div class="profile-content-right">
                     <div class="big-screenshot-item">
-                        <div class="big-screenshot-top-aria">
+                        <div class="big-screenshot-top-aria" v-for="(item, index) in 6" :key="index">
                             <a href="">
-                                <img src="..\assets\img1.png" alt="">
+                                <img :src="`..\assets\img${index + 1}.png`" alt="">
                             </a>
                         </div>
                         <div class="big-screenshot-bottom-aria">
@@ -76,7 +76,7 @@
                                 </div>
                             </div>
                             <div class="big-screenshot-weblink">
-                                <a href="/aboutme">當前網頁跳轉連結</a>
+                                <a href="/animelist">當前網頁跳轉連結</a>
                             </div>
                         </div>
 
