@@ -1,6 +1,23 @@
 <script setup>
-// import { ref } from 'vue';
-// import axios from 'axios';
+import { ref } from 'vue';
+import axios from 'axios';
+
+const data = ref({
+    artlist: [
+        {
+            url: "/animelist",
+            title: "Animelist",
+        },
+        {
+            url: "/mapproject",
+            title: "MapProject",
+        },
+        {
+            url: "/twitterclone",
+            title: "TwitterClone",
+        }
+    ],
+})
 </script>
 
 <template>
@@ -40,21 +57,13 @@
             </div>
             <div class="content-aria-profile-content">
                 <div class="profile-content-left">
-                    <div class="webscreenshot_item">
+                    <div class="webscreenshot_item" v-for="(item, index) in data.artlist" :key="index + 1">
                         <div class="screenshot">
-                            <a href="/twitterclone">
-                                <img src="..\assets\img1.png" alt="">
-                            </a>
-                        </div>
-                        <div class="usetech-description">使用技術</div>
-                    </div>
-                    <div class="webscreenshot_item">
-                        <div class="screenshot">
-                            <router-link to="/animelist" class="transition-link">
+                            <router-link :to="item.url" class="transition-link">
                                 <img src="..\assets\img1.png" alt="">
                             </router-link>
                         </div>
-                        <div class="usetech-description">Animelist</div>
+                        <div class="usetech-description">{{ item.title }}</div>
                     </div>
                 </div>
                 <div class="profile-content-right">
