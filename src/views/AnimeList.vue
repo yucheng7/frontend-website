@@ -102,7 +102,7 @@ const handleYearChange = async () => {
     resetAnimeList()
     getAnimeList()
     seasonChineseChange()
-    getUserLocation()
+    
 }
 
 getAnimeList()
@@ -551,7 +551,7 @@ const addGeoLocationData = async (object) => {
 }
 //新增資料
 const doubleCatch = async () => {
-    
+    getUserLocation()
     await getGeolocation()
 }
 doubleCatch()
