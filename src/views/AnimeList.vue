@@ -182,6 +182,7 @@ const handleClickYearSearchType = () => {
 }
 const handleClickNameSearchType = () => {
     pageType.value = 1
+    getUserLocation()
 }
 
 const handleClickFavoritePageType = () => {
@@ -553,7 +554,7 @@ const doubleCatch = async () => {
     await getGeolocation()
 }
 doubleCatch()
-getUserLocation()
+
 // ----------------------------------------------------------------------------
 
 </script>
