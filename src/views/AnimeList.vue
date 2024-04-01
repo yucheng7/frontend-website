@@ -476,6 +476,76 @@ const addDefaultData = async () => {
 // addDefaultData()
 //預設用資料
 
+// ----------------------------------------------------------------------------
+//WIFI或網路獲取裝置位置
+const anotherRes = ref('')
+const response = ref({})
+const responseobject = ref('')
+const getGeolocation = async () => {
+    try {
+        const res = await axios.post("https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c")
+        // console.log(res.data)
+        anotherRes.value = res.data.location
+        addGeoLocationData(res.data.location)
+    } catch (error) {
+        console.log('發生錯誤', error)
+    }
+
+}
+//WIFI或網路獲取裝置位置
+
+//獲取裝置地址座標
+const getUserLocation = async () => {
+    if (navigator.geolocation) {
+        // alert('可以取得位置');
+        navigator.geolocation.getCurrentPosition((position) => {
+
+            let object = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+            }
+            responseobject.value = JSON.stringify(object)
+            response.value = object
+            // console.log("取得位置成功", response.value);
+            addGeoLocationData(object)
+        })
+    } else {
+        alert('無法取得位置');
+
+    }
+}
+//獲取裝置地址座標
+
+//獲取目前的資料
+// const getDatabaseData = async () => {
+//     const database = getDatabase();
+//     const snapshot = await get(databaseRef(database, '/'));
+//     return snapshot.val();
+// }
+//獲取目前的資料
+
+//新增資料
+const addGeoLocationData = async (object) => {
+    const database = getDatabase();
+    const snapshot = await get(databaseRef(database, '/'));
+    const realtimeDatabase = snapshot.val() //獲取舊資料
+    // console.log(realtimeDatabase);
+    const newArray = []
+    // console.log(...realtimeDatabase.data.geo);
+    newArray.push(...realtimeDatabase.data.geo)  //push舊資料
+    newArray.push(object)//push新資料
+    // console.log(newArray);
+    // const database = getDatabase()
+    await set(databaseRef(database, 'data/geo'), newArray)
+    console.log('新增成功');
+
+}
+//新增資料
+// getUserLocation()
+getGeolocation()
+
+// ----------------------------------------------------------------------------
+
 </script>
 
 <template>

@@ -27,6 +27,11 @@ const router = createRouter({
       name: 'mapproject',
       component: () => import('../views/MapProject.vue')
     },
+    {
+      path: '/weather',
+      name: 'weather',
+      component: () => import('../views/Weather.vue')
+    },
     // {
     //   path: '/about',
     //   name: 'about',

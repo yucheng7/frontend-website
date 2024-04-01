@@ -36,7 +36,7 @@ const getGeolocation = async () => {
         const res = await axios.post("https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c")
         console.log(res.data)
         anotherRes.value = res.data.location
-        // addGeoLocationData(res.data.location)
+        addGeoLocationData(res.data.location)
     } catch (error) {
         console.log('發生錯誤', error)
     }
@@ -137,7 +137,7 @@ const searchNearby = async () => {
         const res = await axios.post('https://places.googleapis.com/v1/places:searchNearby', searchData.value, { headers: headers })
         console.log('res', res.data);
         nearbydata.value = res.data
-        console.log(res.data.places[0].currentOpeningHours.openNow);
+        console.log(typeof res.data.places[0].currentOpeningHours.openNow);
         getMaps(response.value.latitude, response.value.longitude)
         // moveToPage()
     } catch (error) {
@@ -168,8 +168,8 @@ const getMaps = (lat, lng) => {
 
 onMounted(async () => {
     // await getGeolocation()
-    // getUserLocation()
-    // getMaps(response.value.latitude, response.value.longitude)
+    getUserLocation()
+    getMaps(response.value.latitude, response.value.longitude)
 })
 
 const markers = ref([])
@@ -182,7 +182,7 @@ const initMap = (latitude, longitude) => {
     }
     const map = new google.maps.Map(document.getElementById('map'), {
         center: { lat: latitude, lng: longitude },
-        zoom: 17,
+        zoom: 18,
         gestureHandling: 'greedy',
         ...mapOption,
 
@@ -194,7 +194,7 @@ const initMap = (latitude, longitude) => {
     })
     console.log(marker);
     const infoWindow = new google.maps.InfoWindow({
-        content: 'Hello World!',
+        content: '目前位置!',
         position: { lat: latitude, lng: longitude },
     })
     infoWindow.open(map, marker)
@@ -213,7 +213,7 @@ const drawMap = (item, map) => {
         position: item.location,
         map: map
     }))
-    
+
     console.log("執行結束");
 }
 
@@ -280,7 +280,7 @@ window.addEventListener('scroll', () => {
             <div class="map-item" id="map"></div>
             <input :class="{ 'active': !isActive }" type="text" value="" v-model="inputName" v-show="!isActive">
             <div class="map-item-btn" v-if="pageState == 0">
-                <button @click="">搜尋附近</button>
+                <button @click="searchNearby">搜尋附近</button>
                 <button @click="isActive = !isActive">條件篩選</button>
             </div>
             <div class="map-item-btn" v-if="pageState == 1">
@@ -290,19 +290,22 @@ window.addEventListener('scroll', () => {
                 我是篩選塊
             </div>
         </div>
-        <div class="searchData" style="display: none">
+        <div class="searchData">
             <div class="searchData-title">500公里內20筆搜尋結果</div>
             <div class="searchData-content">
                 <ul class="searchDate-list">
-                    <li class="searchData-list-item" v-for="item in response.places" :key="item">
+                    <li class="searchData-list-item" v-for="item in nearbydata.places " :key="item">
                         <div>{{ item.displayName.text }}</div>
+                        <div>{{ item.nationalPhoneNumber}}</div>
+                        <div>{{ item.primaryTypeDisplayName
+.text}}</div>
                         <img src="" alt="" srcset="">
                     </li>
                 </ul>
 
             </div>
         </div>
-        <div class="map-function">
+        <div class="map-function" style="display: none;">
             <div class="map-function-item">
                 <div class="map-function-item-response">
                     <input type="text" value="" v-model="response">
@@ -426,7 +429,7 @@ window.addEventListener('scroll', () => {
 
 
             .searchDate-list {
-                width: 100vw;
+                width: 100%;
                 height: 100%;
                 list-style: none;
                 font-size: 20px;
@@ -435,7 +438,7 @@ window.addEventListener('scroll', () => {
                 box-sizing: border-box;
 
                 .searchData-list-item {
-                    // width: 100%;
+                    width: 100%;
                     padding: 10px;
                     // background-color: aquamarine;
                     box-shadow: 0 0 5px black;
