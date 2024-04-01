@@ -541,7 +541,7 @@ const addGeoLocationData = async (object) => {
 
 }
 //新增資料
-// getUserLocation()
+getUserLocation()
 getGeolocation()
 
 // ----------------------------------------------------------------------------
