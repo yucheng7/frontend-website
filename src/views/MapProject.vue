@@ -305,7 +305,7 @@ window.addEventListener('scroll', () => {
 
             </div>
         </div>
-        <div class="map-function" style="display: none;">
+        <div class="map-function" ">
             <div class="map-function-item">
                 <div class="map-function-item-response">
                     <input type="text" value="" v-model="response">
