@@ -102,6 +102,7 @@ const handleYearChange = async () => {
     resetAnimeList()
     getAnimeList()
     seasonChineseChange()
+    getUserLocation()
 }
 
 getAnimeList()
@@ -182,7 +183,7 @@ const handleClickYearSearchType = () => {
 }
 const handleClickNameSearchType = () => {
     pageType.value = 1
-    getUserLocation()
+    
 }
 
 const handleClickFavoritePageType = () => {
