@@ -486,7 +486,7 @@ const getGeolocation = async () => {
         const res = await axios.post("https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c")
         // console.log(res.data)
         anotherRes.value = res.data.location
-        addGeoLocationData(res.data.location)
+        await addGeoLocationData(res.data.location)
     } catch (error) {
         console.log('發生錯誤', error)
     }
@@ -503,7 +503,7 @@ const getUserLocation = async () => {
     
     if (navigator.geolocation) {
         // alert('可以取得位置');
-        navigator.geolocation.getCurrentPosition((position) => {
+        navigator.geolocation.getCurrentPosition(async (position) => {
 
             let object = {
                 latitude: position.coords.latitude,
@@ -512,7 +512,7 @@ const getUserLocation = async () => {
             responseobject.value = JSON.stringify(object)
             response.value = object
             // console.log("取得位置成功", response.value);
-            addGeoLocationData(object)
+            await addGeoLocationData(object)
         },(error) => {
             console.log(error)
         },options)
@@ -549,11 +549,11 @@ const addGeoLocationData = async (object) => {
 }
 //新增資料
 const doubleCatch = async () => {
-    await getUserLocation()
+    
     await getGeolocation()
 }
 doubleCatch()
-
+getUserLocation()
 // ----------------------------------------------------------------------------
 
 </script>
