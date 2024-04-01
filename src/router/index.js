@@ -4,11 +4,11 @@ import { createRouter, createWebHistory } from 'vue-router'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    {
-      path: '/',
-      name: 'aboutme',
-      component: () => import('../views/AboutMe.vue')
-    },
+    // {
+    //   path: '/',
+    //   name: 'aboutme',
+    //   component: () => import('../views/AboutMe.vue')
+    // },
     {
       path: '/twitterclone',
       name: 'twitterclone',
