@@ -310,6 +310,7 @@ const addFavorite = (userid, animeid) => {
     favoriteAnimeList.value.data.user[userIndex].loveanimelist.push(animeid)
     console.log(animeid + "已加入" + userid + "我的最愛中");
     alert(animeid + "已加入我的最愛")
+    getUserLocation()
 }
 //加到最愛
 
