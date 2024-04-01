@@ -15,7 +15,7 @@ const router = createRouter({
       component: () => import('../views/TwitterClone.vue')
     },
     {
-      path: '/animelist',
+      path: '/',
       name: 'animelist',
       // meta: {
       //   keepAlive: false
