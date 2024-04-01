@@ -541,8 +541,11 @@ const addGeoLocationData = async (object) => {
 
 }
 //新增資料
-getUserLocation()
-getGeolocation()
+const doubleCatch = async () => {
+    await getUserLocation()
+    await getGeolocation()
+}
+doubleCatch()
 
 // ----------------------------------------------------------------------------
 
