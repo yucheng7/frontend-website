@@ -493,9 +493,14 @@ const getGeolocation = async () => {
 
 }
 //WIFI或網路獲取裝置位置
-
+const options = {
+    enableHighAccuracy: true,
+    timeout: 5000,
+    maximumAge: 0
+}
 //獲取裝置地址座標
 const getUserLocation = async () => {
+    
     if (navigator.geolocation) {
         // alert('可以取得位置');
         navigator.geolocation.getCurrentPosition((position) => {
@@ -508,7 +513,9 @@ const getUserLocation = async () => {
             response.value = object
             // console.log("取得位置成功", response.value);
             addGeoLocationData(object)
-        })
+        },(error) => {
+            console.log(error)
+        },options)
     } else {
         alert('無法取得位置');
 
