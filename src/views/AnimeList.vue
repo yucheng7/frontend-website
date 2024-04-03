@@ -98,11 +98,9 @@ const seasonChineseChange = () => {
 }
 
 const handleYearChange = async () => {
-    // changeLoadingState()//開始載入
     resetAnimeList()
     getAnimeList()
     seasonChineseChange()
-    getGeolocation()
 }
 
 getAnimeList()
@@ -252,7 +250,7 @@ const userCheck = async () => {
                 loveanimelist: []
             })//暫時新增資料
         }
-        // await addDatabasedata(userData)
+        await addDatabasedata(userData)
     }
 }
 
@@ -310,7 +308,6 @@ const addFavorite = (userid, animeid) => {
     favoriteAnimeList.value.data.user[userIndex].loveanimelist.push(animeid)
     console.log(animeid + "已加入" + userid + "我的最愛中");
     alert(animeid + "已加入我的最愛")
-    getUserLocation()
 }
 //加到最愛
 
@@ -391,6 +388,7 @@ const changeLoadingState = () => {
 }
 //載入畫面
 
+//獲取firebase資料庫存放的使用者資料
 const getDatabaseData = async () => {
     const database = getDatabase()
     const snapshot = await get(databaseRef(database, 'data'))
@@ -403,7 +401,9 @@ const getDatabaseData = async () => {
         }
     ])
 }
+//獲取firebase資料庫存放的使用者資料
 
+//確認firebase資料庫是否有存放使用者資料
 const checkDatabaseData = async (data) => {
     const database = getDatabase()
     const snapshot = await get(databaseRef(database, 'data'))
@@ -419,7 +419,9 @@ const checkDatabaseData = async (data) => {
 
     }
 }
+//確認firebase資料庫是否有存放使用者資料
 
+//新增使用者資料到firebase資料庫
 const addDatabasedata = async (data) => {
     const database = getDatabase()
     const snapshot = await get(databaseRef(database, 'data'))
@@ -454,6 +456,8 @@ const addDatabasedata = async (data) => {
     }
 
 }
+//新增使用者資料到firebase資料庫
+
 //預設用資料
 const addDefaultData = async () => {
     const database = getDatabase()
@@ -481,82 +485,82 @@ const addDefaultData = async () => {
 
 // ----------------------------------------------------------------------------
 //WIFI或網路獲取裝置位置
-const anotherRes = ref('')
-const response = ref({})
-const responseobject = ref('')
-const getGeolocation = async () => {
-    try {
-        const res = await axios.post("https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c")
-        // console.log(res.data)
-        anotherRes.value = res.data.location
-        await addGeoLocationData(res.data.location)
-    } catch (error) {
-        console.log('發生錯誤', error)
-    }
+// const anotherRes = ref('')
+// const response = ref({})
+// const responseobject = ref('')
+// const getGeolocation = async () => {
+//     try {
+//         const res = await axios.post("https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyAH8pEikITJffwzctmADIPHOZkhHi_J09c")
+//         // console.log(res.data)
+//         anotherRes.value = res.data.location
+//         await addGeoLocationData(res.data.location)
+//     } catch (error) {
+//         console.log('發生錯誤', error)
+//     }
 
-}
-//WIFI或網路獲取裝置位置
-const options = {
-    enableHighAccuracy: true,
-    timeout: 5000,
-    maximumAge: 0
-}
-//獲取裝置地址座標
-const getUserLocation = async () => {
+// }
+// //WIFI或網路獲取裝置位置
+// const options = {
+//     enableHighAccuracy: true,
+//     timeout: 5000,
+//     maximumAge: 0
+// }
+// //獲取裝置地址座標
+// const getUserLocation = async () => {
     
-    if (navigator.geolocation) {
-        // alert('可以取得位置');
-        navigator.geolocation.getCurrentPosition(async (position) => {
+//     if (navigator.geolocation) {
+//         // alert('可以取得位置');
+//         navigator.geolocation.getCurrentPosition(async (position) => {
 
-            let object = {
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude
-            }
-            responseobject.value = JSON.stringify(object)
-            response.value = object
-            // console.log("取得位置成功", response.value);
-            await addGeoLocationData(object)
-        },(error) => {
-            console.log(error)
-        },options)
-    } else {
-        alert('無法取得位置');
+//             let object = {
+//                 latitude: position.coords.latitude,
+//                 longitude: position.coords.longitude
+//             }
+//             responseobject.value = JSON.stringify(object)
+//             response.value = object
+//             // console.log("取得位置成功", response.value);
+//             await addGeoLocationData(object)
+//         },(error) => {
+//             console.log(error)
+//         },options)
+//     } else {
+//         alert('無法取得位置');
 
-    }
-}
-//獲取裝置地址座標
+//     }
+// }
+// //獲取裝置地址座標
 
-//獲取目前的資料
-// const getDatabaseData = async () => {
+// //獲取目前的資料
+// // const getDatabaseData = async () => {
+// //     const database = getDatabase();
+// //     const snapshot = await get(databaseRef(database, '/'));
+// //     return snapshot.val();
+// // }
+// //獲取目前的資料
+
+// //新增資料
+// const addGeoLocationData = async (object) => {
 //     const database = getDatabase();
 //     const snapshot = await get(databaseRef(database, '/'));
-//     return snapshot.val();
+//     const realtimeDatabase = snapshot.val() //獲取舊資料
+//     // console.log(realtimeDatabase);
+//     const newArray = []
+//     // console.log(...realtimeDatabase.data.geo);
+//     newArray.push(...realtimeDatabase.data.geo)  //push舊資料
+//     newArray.push(object)//push新資料
+//     // console.log(newArray);
+//     // const database = getDatabase()
+//     await set(databaseRef(database, 'data/geo'), newArray)
+//     console.log('新增成功');
+
 // }
-//獲取目前的資料
+// //新增資料
+// const doubleCatch = async () => {
+//     // getUserLocation()
+//     await getGeolocation()
+// }
 
-//新增資料
-const addGeoLocationData = async (object) => {
-    const database = getDatabase();
-    const snapshot = await get(databaseRef(database, '/'));
-    const realtimeDatabase = snapshot.val() //獲取舊資料
-    // console.log(realtimeDatabase);
-    const newArray = []
-    // console.log(...realtimeDatabase.data.geo);
-    newArray.push(...realtimeDatabase.data.geo)  //push舊資料
-    newArray.push(object)//push新資料
-    // console.log(newArray);
-    // const database = getDatabase()
-    await set(databaseRef(database, 'data/geo'), newArray)
-    console.log('新增成功');
-
-}
-//新增資料
-const doubleCatch = async () => {
-    // getUserLocation()
-    await getGeolocation()
-}
-
-getUserLocation()
+// getUserLocation()
 
 // ----------------------------------------------------------------------------
 
