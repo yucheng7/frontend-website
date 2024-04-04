@@ -44,7 +44,7 @@ const perPage = ref(50)
 const page = ref(1)
 const seasonChinese = ref('春季')
 
-async function getAnimeList(){
+async function getAnimeList() {
     try {
         const res = await axios.get(`https://api.annict.com/v1/works?access_token=C23CjuV8eGIYLnn0qRkUUhDTWdl6KFwuS-ZzzTy9IB0&sort_id=desc&filter_season=${filterYear.value}-${filterSeason.value}&per_page=${perPage.value}&page=${page.value}`)
         totalCount.value = res.data.total_count
@@ -78,7 +78,7 @@ async function getAnimeList(){
     }
 }
 
-function resetAnimeList(){
+function resetAnimeList() {
     data.value = []
     totalCount.value = 0
     listCount.value = 0
@@ -86,7 +86,7 @@ function resetAnimeList(){
     idGroup.value = []
 }
 
-function seasonChineseChange(){
+function seasonChineseChange() {
     if (filterSeason.value == 'spring') {
         seasonChinese.value = '春季'
     } else if (filterSeason.value == 'summer') {
@@ -98,7 +98,7 @@ function seasonChineseChange(){
     }
 }
 
-async function handleYearChange(){
+async function handleYearChange() {
     resetAnimeList()
     getAnimeList()
     seasonChineseChange()
@@ -110,7 +110,7 @@ getAnimeList()
 // 獲取動漫製作組資料 //
 
 const idGroup = ref([])
-async function getAnimeStaffList(){
+async function getAnimeStaffList() {
     //獲取動漫ID
 
     data.value.forEach(async (item, index) => {
@@ -148,7 +148,7 @@ for (yearsCount.value = 2024; yearsCount.value >= 1990; yearsCount.value--) {
 const animeTitle = ref('ラブライブ')
 let animeTitleSave = ''
 const searchTypeAnimelist = ref([])
-async function getSearchAnimeList(){
+async function getSearchAnimeList() {
     try {
         const res = await axios.get(`https://api.annict.com/v1/works?access_token=C23CjuV8eGIYLnn0qRkUUhDTWdl6KFwuS-ZzzTy9IB0&sort_season=desc&filter_title=${animeTitle.value}`)
         searchTypeAnimelist.value = res.data.works
@@ -160,7 +160,7 @@ async function getSearchAnimeList(){
     }
 }
 
-function handleSearchChange(){
+function handleSearchChange() {
     // 先把變量重置
     searchTypeAnimelist.value = []
     // 先把變量重置
@@ -177,15 +177,15 @@ getSearchAnimeList()
 //0 = 年份 1 = 作品名
 const pageType = ref(0)
 //0 = 年份 1 = 作品名 2=我的最愛列表
-function handleClickYearSearchType(){
+function handleClickYearSearchType() {
     pageType.value = 0
 }
-function handleClickNameSearchType(){
+function handleClickNameSearchType() {
     pageType.value = 1
 
 }
 
-function handleClickFavoritePageType(){
+function handleClickFavoritePageType() {
     getFavoriteList()
     pageType.value = 2
 }
@@ -203,14 +203,14 @@ const loginUser = ref('') // 儲存目前登入使用者
 const loginBox = ref(false) // 登入框顯示
 const userState = ref(false) // 是否為登入狀態
 const logoutBox = ref(false) // 登出框顯示
-async function createNewUser(){
+async function createNewUser() {
     try {
         changeMessageBoxState('註冊新使用者中');
         await firebase.auth().createUserWithEmailAndPassword(userEmail.value, userPassword.value);
         console.log('註冊成功');
         // alert('註冊成功');
         changeMessageBoxState('註冊成功，將自動登入');
-        userLogin();
+        await userLogin();
     } catch (error) {
         console.log(error.message);
         console.log('註冊失敗');
@@ -218,24 +218,24 @@ async function createNewUser(){
         // alert('註冊失敗，帳號格式錯誤或密碼未達6位數規範，請重新註冊');
     }
 }
-async function userLogin(){
+async function userLogin() {
     try {
         const res = await firebase.auth().signInWithEmailAndPassword(userEmail.value, userPassword.value)
         console.log('登入成功');
         console.log(res);
         // alert('登入成功')
         changeMessageBoxState('使用者已登入')
-        userCheck()
+        await userCheck()
     } catch (error) {
         console.log(error.message);
         console.log('登入失敗');
         // alert('登入失敗')
         changeMessageBoxState('登入失敗')
-        createNewUser()
+        await createNewUser()
     }
 }
 
-async function userCheck(){
+async function userCheck() {
     const user = firebase.auth().currentUser
     if (user) {
         console.log('已登入')
@@ -264,7 +264,7 @@ async function userCheck(){
 // 註冊登入功能
 
 // 註冊登出功能
-function userLogout(){
+function userLogout() {
     // userEmail.value = ''
     // userPassword.value = ''
     loginUser.value = ''
@@ -279,7 +279,7 @@ function userLogout(){
 // 註冊登出功能
 
 //回到頂部功能
-function backToTop(){
+function backToTop() {
     window.scrollTo({
         top: 0,
         behavior: 'smooth'
@@ -308,7 +308,7 @@ const favoriteAnimeList = ref({
 })
 // console.log(favoriteAnimeList.value.data.user[0].loveanimelist);
 // const favoriteAnimeList = ref([])
-function addFavorite(userid, animeid){
+function addFavorite(userid, animeid) {
     const userIndex = favoriteAnimeList.value.data.user.findIndex((item) => {
         return item.uid == userUid.value
     }) //獲得當前登入使用者的資料位於數列中的索引值
@@ -320,7 +320,7 @@ function addFavorite(userid, animeid){
 //加到最愛
 
 //刪除最愛
-function cancelFavoriteAnime(animeid){
+function cancelFavoriteAnime(animeid) {
     const userIndex = favoriteAnimeList.value.data.user.findIndex((item) => {
         return item.uid == userUid.value
     }) //獲得當前登入使用者的資料位於數列中的索引值
@@ -333,7 +333,7 @@ function cancelFavoriteAnime(animeid){
 //刪除最愛
 
 //判斷是否在我的最愛
-function checkAnimeInFavoriteList(useruid, animeid){
+function checkAnimeInFavoriteList(useruid, animeid) {
     const nowUserData = favoriteAnimeList.value.data.user.find((item) => {
         return item.uid == useruid
     })
@@ -357,7 +357,7 @@ const userInfoBox = ref(false)
 const loginUserIndex = ref('')
 const loginUserFavoriteList = ref([])
 const loginUserFavoriteListId = ref([])
-function getFavoriteList(){
+function getFavoriteList() {
     loginUserFavoriteList.value = []
     loginUserIndex.value = favoriteAnimeList.value.data.user.findIndex((item) => {
         return item.uid == userUid.value
@@ -382,14 +382,14 @@ window.addEventListener('scroll', () => {
 //判斷頁面是否滾動離開頂部功能
 
 //我的最愛列表-刪除我的最愛項目
-function deleteFavoritelistItem(animeid){
+function deleteFavoritelistItem(animeid) {
     cancelFavoriteAnime(animeid)
     getFavoriteList()
 }
 //我的最愛列表-刪除我的最愛項目
 
 //獲取firebase資料庫存放的使用者資料
-async function getDatabaseData(){
+async function getDatabaseData() {
     const database = getDatabase()
     const snapshot = await get(databaseRef(database, 'data'))
     console.log(snapshot.val());
@@ -404,7 +404,7 @@ async function getDatabaseData(){
 //獲取firebase資料庫存放的使用者資料
 
 //確認firebase資料庫是否有存放使用者資料
-async function checkDatabaseData(data){
+async function checkDatabaseData(data) {
     const database = getDatabase()
     const snapshot = await get(databaseRef(database, 'data'))
     console.log(snapshot.val().user);
@@ -422,7 +422,7 @@ async function checkDatabaseData(data){
 //確認firebase資料庫是否有存放使用者資料
 
 //新增使用者資料到firebase資料庫
-async function addDatabasedata(data){
+async function addDatabasedata(data) {
     const database = getDatabase()
     const snapshot = await get(databaseRef(database, 'data'))
     console.log(snapshot.val());
@@ -459,7 +459,7 @@ async function addDatabasedata(data){
 //新增使用者資料到firebase資料庫
 
 //預設用資料
-async function addDefaultData(){
+async function addDefaultData() {
     const database = getDatabase()
     const snapshot = await get(databaseRef(database, 'data'))
     console.log(snapshot.val());
@@ -567,10 +567,12 @@ async function addDefaultData(){
 // 提示訊息
 const messageState = ref(false)
 const messageContent = ref('成功訊息')
-let timer = null
-function changeMessageBoxState(msg){
-    
-    const newTimer = () => {
+
+function changeMessageBoxState(msg) {
+    let timer = null;
+    function newTimer() {
+
+        messageState.value = false
         clearTimeout(timer)
         messageContent.value = msg
         messageState.value = true
@@ -579,7 +581,8 @@ function changeMessageBoxState(msg){
             messageState.value = false
             console.log('已經過1秒了');
             messageContent.value = '成功訊息'
-        }, 1000)
+        }, 2000)
+
     }
     newTimer()
 }
@@ -644,7 +647,7 @@ provide('messageState', messageState)
                                     <div class="animelist-content-item-description-img-favorite"
                                         v-if="userState && !checkAnimeInFavoriteList(userUid, item.id)"
                                         @click="addFavorite(userUid, item.id)">未加入最愛</div>
-                                    <div :class="{ 'animelist-content-item-description-img-favorite': true}"
+                                    <div :class="{ 'animelist-content-item-description-img-favorite': true }"
                                         v-if="userState && checkAnimeInFavoriteList(userUid, item.id)"
                                         @click="cancelFavoriteAnime(item.id)">已加入最愛</div>
                                 </div>
