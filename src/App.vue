@@ -1,7 +1,9 @@
 <template>
-  <Transition name="fade">
-    <router-view/>
-  </Transition>
+  <router-view v-slot="{ Component }">
+    <transition name="fade">
+      <component :is="Component" />
+    </transition>
+  </router-view>
 </template>
 
 <style lang="scss">
@@ -29,11 +31,11 @@ nav {
 
 .fade-enter-active,
 .fade-leave-active {
-    transition: opacity 0.5s ease-in-out;
+  transition: opacity 0.5s ease-in-out;
 }
 
 .fade-enter-from,
 .fade-leave-to {
-    opacity: 0;
+  opacity: 0;
 }
 </style>
