@@ -205,16 +205,16 @@ const userState = ref(false) // 是否為登入狀態
 const logoutBox = ref(false) // 登出框顯示
 async function createNewUser() {
     try {
-        changeMessageBoxState('註冊新使用者中');
+        debounceMessage('註冊新使用者中');
         await firebase.auth().createUserWithEmailAndPassword(userEmail.value, userPassword.value);
         console.log('註冊成功');
         // alert('註冊成功');
-        changeMessageBoxState('註冊成功，將自動登入');
+        debounceMessage('註冊成功，將自動登入');
         await userLogin();
     } catch (error) {
         console.log(error.message);
         console.log('註冊失敗');
-        changeMessageBoxState('註冊失敗，帳號格式錯誤或密碼未達6位數規範，請重新註冊');
+        debounceMessage('註冊失敗，帳號格式錯誤或密碼未達6位數規範，請重新註冊');
         // alert('註冊失敗，帳號格式錯誤或密碼未達6位數規範，請重新註冊');
     }
 }
@@ -224,14 +224,14 @@ async function userLogin() {
         console.log('登入成功');
         console.log(res);
         // alert('登入成功')
-        changeMessageBoxState('使用者已登入')
+        debounceMessage('使用者已登入')
         await userCheck()
     } catch (error) {
         console.log(error.message);
         console.log('登入失敗');
         // alert('登入失敗')
-        changeMessageBoxState('登入失敗')
-        await createNewUser()
+        
+        debounceMessage('登入失敗，帳號或密碼錯誤')
     }
 }
 
@@ -273,7 +273,7 @@ function userLogout() {
     logoutBox.value = false
     sideToolShow.value = true
     console.log('登出成功');
-    changeMessageBoxState('登出成功')
+    debounceMessage("登出成功")
     pageType.value = 0
 }
 // 註冊登出功能
@@ -315,7 +315,7 @@ function addFavorite(userid, animeid) {
     favoriteAnimeList.value.data.user[userIndex].loveanimelist.push(animeid)
     console.log(animeid + "已加入" + userid + "我的最愛中");
     // alert(animeid + "已加入我的最愛")
-    changeMessageBoxState("已加入最愛")
+    debounceMessage("已加入最愛")
 }
 //加到最愛
 
@@ -328,7 +328,8 @@ function cancelFavoriteAnime(animeid) {
     favoriteAnimeList.value.data.user[userIndex].loveanimelist = res
     // console.log(animeid + "已刪除");
     // alert(animeid + "已刪除")
-    changeMessageBoxState("已移除最愛")
+    
+    debounceMessage("已移除最愛")
 }
 //刪除最愛
 
@@ -569,27 +570,32 @@ const messageState = ref(false)
 const messageContent = ref('成功訊息')
 
 function changeMessageBoxState(msg) {
-    let timer = null;
-    function newTimer() {
-
-        messageState.value = false
-        clearTimeout(timer)
         messageContent.value = msg
         messageState.value = true
         console.log('開始計時了');
-        timer = setTimeout(() => {
+        setTimeout(() => {
             messageState.value = false
             console.log('已經過1秒了');
             messageContent.value = '成功訊息'
         }, 2000)
-
-    }
-    newTimer()
 }
 provide('messageContent', messageContent)
 provide('messageState', messageState)
 // 提示訊息
 
+function debounce(fn, delay) {
+    let timer = null
+    return function (...args) {
+        if (timer) {
+            clearTimeout(timer)
+        }
+        timer = setTimeout(() => {
+            fn.apply(this, args)
+        }, delay)
+    }
+}
+
+const debounceMessage = debounce(changeMessageBoxState, 1000)
 </script>
 
 <template>
@@ -602,7 +608,7 @@ provide('messageState', messageState)
                     <div :class="{ 'animelist-search-switch-year': true, 'highlight': pageType == 0 }"
                         @click="handleClickYearSearchType">季度搜尋</div>
                     <div :class="{ 'animelist-search-switch-name': true, 'highlight': pageType == 1 }"
-                        @click="handleClickNameSearchType">作品名搜尋</div>
+                        @click="handleClickNameSearchType">作品搜尋</div>
                     <div :class="{ 'animelist-search-switch-favorite': true, 'highlight': pageType == 2 }"
                         @click="handleClickFavoritePageType" v-if="userState">
                         我的最愛
