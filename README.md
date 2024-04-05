@@ -1,35 +1,16 @@
 # frontend-website
 
-This template should help get you started developing with Vue 3 in Vite.
+使用Vue.js開發的作品網站
 
-## Recommended IDE Setup
+# 網站開發工具
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+- 使用Vue.js開發
+- Axios串接Annict的api
+- CSS預處理器 SCSS
+- 用firebase做使用者登入、註冊功能
 
-## Customize configuration
+# 網站功能
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+- 依年份、季節、作品名搜尋動漫
+- 使用者登入、登出、註冊
+- 加入、刪除我的最愛
