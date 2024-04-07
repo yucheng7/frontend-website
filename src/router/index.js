@@ -15,7 +15,7 @@ const router = createRouter({
       component: () => import('../views/TwitterClone.vue')
     },
     {
-      path: '/',
+      path: '/animelist',
       name: 'animelist',
       // meta: {
       //   keepAlive: false
@@ -33,7 +33,7 @@ const router = createRouter({
       component: () => import('../views/Weather.vue')
     },
     {
-      path: '/panasonicclone',
+      path: '/',
       name: 'panasonicclone',
       component: () => import('../views/PanasonicClone.vue')
     },
