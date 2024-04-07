@@ -32,6 +32,11 @@ const router = createRouter({
       name: 'weather',
       component: () => import('../views/Weather.vue')
     },
+    {
+      path: '/panasonicclone',
+      name: 'panasonicclone',
+      component: () => import('../views/PanasonicClone.vue')
+    },
     // {
     //   path: '/about',
     //   name: 'about',
