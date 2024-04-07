@@ -159,8 +159,11 @@ const videoData = [
     'https://recruit.industry.panasonic.com/wp-content/themes/panasonic-industry-recruit-2024/assets/movies/case-5.mp4'
 ]
 
-function autoPlay() {
-
+function backToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    })
 }
 </script>
 
@@ -354,43 +357,193 @@ function autoPlay() {
                         <div class="content-about-us-content-box-cardaria">
                             <div class="content-about-us-content-box-card">
                                 <h3>01</h3>
+                                <img src="https://recruit.industry.panasonic.com/wp-content/themes/panasonic-industry-recruit-2024/assets/images/home/about-fig-4.png"
+                                    alt="">
                                 <div class="content-about-us-content-box-card-text">
                                     <div class="content-about-us-content-box-card-text-button">
                                         <div class="content-about-us-content-box-card-text-button-arrow"> > </div>
                                         <div class="content-about-us-content-box-card-text-button-text">経営戦略</div>
                                     </div>
-                                    <div class="content-about-us-content-box-card-text-desp">社会要請が強く継続的な進化が求められる領域を、3つの注力領域と4つのコア事業に定め、注力しています。</div>
+                                    <div class="content-about-us-content-box-card-text-desp">
+                                        社会要請が強く継続的な進化が求められる領域を、3つの注力領域と4つのコア事業に定め、注力しています。</div>
                                 </div>
                             </div>
                             <div class="content-about-us-content-box-card">
                                 <h3>02</h3>
+                                <img src="https://recruit.industry.panasonic.com/wp-content/themes/panasonic-industry-recruit-2024/assets/images/home/about-fig-3.png"
+                                    alt="">
+                                <div class="content-about-us-content-box-card-text">
+                                    <div class="content-about-us-content-box-card-text-button">
+                                        <div class="content-about-us-content-box-card-text-button-arrow"> > </div>
+                                        <div class="content-about-us-content-box-card-text-button-text">人財戦略</div>
+                                    </div>
+                                    <div class="content-about-us-content-box-card-text-desp">
+                                        「個人の想い」と「会社の目指す姿」をつなげること、それこそがパナソニック インダストリーの人財戦略です。</div>
+                                </div>
                             </div>
                             <div class="content-about-us-content-box-card">
-                                <h3>03</h3>    
+                                <h3>03</h3>
+                                <img src="https://recruit.industry.panasonic.com/wp-content/themes/panasonic-industry-recruit-2024/assets/images/home/about-fig-2.png"
+                                    alt="">
+                                <div class="content-about-us-content-box-card-text">
+                                    <div class="content-about-us-content-box-card-text-button">
+                                        <div class="content-about-us-content-box-card-text-button-arrow"> > </div>
+                                        <div class="content-about-us-content-box-card-text-button-text">働く環境</div>
+                                    </div>
+                                    <div class="content-about-us-content-box-card-text-desp">
+                                        “想い”の実現をサポートする働く環境を整備し、一人ひとりがイキイキと活躍できる組織づくりを進めています。</div>
+                                </div>
                             </div>
                             <div class="content-about-us-content-box-card">
-                                <h3>04</h3>    
+                                <h3>04</h3>
+                                <img src="https://recruit.industry.panasonic.com/wp-content/themes/panasonic-industry-recruit-2024/assets/images/home/about-fig-1.png"
+                                    alt="">
+                                <div class="content-about-us-content-box-card-text">
+                                    <div class="content-about-us-content-box-card-text-button">
+                                        <div class="content-about-us-content-box-card-text-button-arrow"> > </div>
+                                        <div class="content-about-us-content-box-card-text-button-text">インダのデータ</div>
+                                    </div>
+                                    <div class="content-about-us-content-box-card-text-desp">
+                                        会社規模や事業実績、社員構成や働き方に関するデータをインフォグラフィックでまとめています。</div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="content-our-story">
+            <!-- <div class="content-our-story">
                 <div class="content-our-story-content">
-                    內容框
+                    <div class="content-our-story-content-title">
+                        <h3>OUR STORY</h3>
+                        <p>社員を知る</p>
+                    </div>
+                    <div class="content-our-story-content-middle">
+                        <div class="content-our-story-content-middle-leftbox">
+                            <h3>プロジェクトストーリー</h3>
+                            <br>
+                            <p>未来の兆しを先取り社会変革をリードする、</p>
+                            <p>パナソニック インダストリーの</p>
+                            <p>取り組みと社員の想いを紹介します。</p>
+                            <div class="content-our-story-content-middle-widthbar"></div>
+                            <div class="content-our-story-content-middle-button-aria">
+                                <div class="content-our-story-content-middle-button-aria-left">
+                                    <div>
+                                        < </div>
+                                            <div> > </div>
+                                    </div>
+                                    <div class="content-our-story-content-middle-button-aria-right">
+                                        <div>記事一覧へ</div>
+                                        <div> > </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="content-our-story-content-middle-rightbox"></div>
+
+                    </div>
+                    <div class="content-our-story-content-bottom">
+                        <div class="content-our-story-content-middle-leftbox">
+                            <h3>プロジェクトストーリー</h3>
+                            <br>
+                            <p>未来の兆しを先取り社会変革をリードする、</p>
+                            <p>パナソニック インダストリーの</p>
+                            <p>取り組みと社員の想いを紹介します。</p>
+                            <div class="content-our-story-content-middle-widthbar"></div>
+                            <div class="content-our-story-content-middle-button-aria">
+                                <div class="content-our-story-content-middle-button-aria-left">
+                                    <div>
+                                        < </div>
+                                            <div> > </div>
+                                    </div>
+                                    <div class="content-our-story-content-middle-button-aria-right">
+                                        <div>記事一覧へ</div>
+                                        <div> > </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="content-our-story-content-middle-rightbox"></div>
+                    </div>
                 </div>
-            </div>
-            <div class="content-our-job">
-                <div class="content-our-job-content">
-                    內容框
+                <div class="content-our-job">
+                    <div class="content-our-job-content">
+                        內容框
+                    </div>
                 </div>
-            </div>
-            <div class="content-entry">
-                <div class="content-entry-content">
-                    內容框
+                <div class="content-entry">
+                    <div class="content-entry-content">
+                        內容框
+                    </div>
+            </div> -->
+            <div class="footer">
+                <div class="footer-content">
+                    <div class="footer-content-link">
+                        <div class="footer-content-link-item">
+                            <div class="footer-content-link-item-left">OUR TECH</div>
+                            <div class="footer-content-link-item-right">
+                                <p>インダのいる世界</p>
+                            </div>
+                        </div>
+                        <div class="footer-content-link-item">
+                            <div class="footer-content-link-item-left">ABOUT US</div>
+                            <div class="footer-content-link-item-right">
+                                <p>経営戦略</p>
+                                <p>人財戦略</p>
+                                <p>働く環境</p>
+                                <p>インダのデータ</p>
+                                <p>プレスリリース</p>
+                            </div>
+                        </div>
+                        <div class="footer-content-link-item">
+                            <div class="footer-content-link-item-left">OUR STORY</div>
+                            <div class="footer-content-link-item-right">
+                                <p>プロジェクトストーリー</p>
+                                <p>タレントストーリー</p>
+                                <p>外部メディア掲載</p>
+                            </div>
+                        </div>
+                        <div class="footer-content-link-item">
+                            <div class="footer-content-link-item-left">OUR JOB</div>
+                            <div class="footer-content-link-item-right">
+                                <p>部門紹介</p>
+                                <p>職種紹介</p>
+                            </div>
+                        </div>
+                        <div class="footer-content-link-item">
+                            <div class="footer-content-link-item-left">ENTRY</div>
+                            <div class="footer-content-link-item-right">
+                                <p>インターンシップ</p>
+                                <p>新卒採用</p>
+                                <p>キャリア採用</p>
+                                <p>高専生採用</p>
+                                <p>高校生採用</p>
+                                <p>障がい者採用（グループ）</p>
+                                <p>障がい者採用（グループ）</p>
+                            </div>
+                        </div>
+                        <div class="footer-content-link-item">
+                            <div class="footer-content-link-item-left">NEWS</div>
+                            <div class="footer-content-link-item-right">お知らせ</div>
+                        </div>
+
+                        <div class="footer-content-bigtext">
+                            <div class="footer-content-bigtext-left">
+                                <h3>Panasonic</h3>
+                                <h4>INDUSTRY</h4>
+                            </div>
+                            <div class="footer-content-bigtext-right">
+                                <img src="https://recruit.industry.panasonic.com/wp-content/themes/panasonic-industry-recruit-2024/assets/images/common/sns-x.png"
+                                    alt="">
+                                <img src="https://recruit.industry.panasonic.com/wp-content/themes/panasonic-industry-recruit-2024/assets/images/common/share-linkedin.png"
+                                    alt="">
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+        <div class="backtotop" @click="backToTop">△</div>
     </div>
 </template>
 
@@ -733,6 +886,7 @@ function autoPlay() {
                     cursor: pointer;
                     padding: 10px;
                     border-radius: 50px;
+
                     &:hover {
                         scale: 1.05;
                     }
@@ -765,25 +919,29 @@ function autoPlay() {
         .content-about-us {
             width: 100%;
             height: 100vh;
-            background-color: blanchedalmond;
+            background-color: lightgray;
             display: flex;
             justify-content: center;
             align-items: center;
+
             .content-about-us-content {
                 background-color: #003B68;
                 width: 100%;
                 height: 100%;
-                border-radius: 50px;
+                // border-radius: 50px;
+                border-top-left-radius: 50px;
+                border-top-right-radius: 50px;
                 padding: 8%;
                 box-sizing: border-box;
                 display: flex;
                 justify-content: center;
                 align-items: center;
+
                 .content-about-us-content-box {
                     // background-color: white;
                     width: 100%;
                     height: 100%;
-                    
+
                     .content-about-us-content-box-title {
                         h3 {
                             color: white;
@@ -791,6 +949,7 @@ function autoPlay() {
                             font-weight: 700;
                             text-align: center;
                         }
+
                         p {
                             color: white;
                             font-size: 20px;
@@ -798,6 +957,7 @@ function autoPlay() {
                             text-align: center;
                         }
                     }
+
                     .content-about-us-content-box-cardaria {
                         // background-color: antiquewhite;
                         width: 100%;
@@ -805,6 +965,7 @@ function autoPlay() {
                         display: flex;
                         justify-content: space-evenly;
                         align-items: center;
+
                         .content-about-us-content-box-card {
                             width: 23%;
                             height: 80%;
@@ -816,20 +977,33 @@ function autoPlay() {
                             display: flex;
                             justify-content: space-between;
                             flex-direction: column;
+                            position: relative;
+
                             h3 {
                                 font-size: 130px;
                                 font-weight: 700;
                                 color: white;
                             }
+
                             &:hover {
                                 scale: 0.95;
                                 cursor: pointer;
                             }
+
+                            img {
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                scale: 0.7;
+                            }
+
                             .content-about-us-content-box-card-text {
                                 padding: 10px;
+
                                 .content-about-us-content-box-card-text-button {
                                     display: flex;
                                     padding: 20px 0;
+
                                     .content-about-us-content-box-card-text-button-arrow {
                                         display: flex;
                                         justify-content: center;
@@ -840,6 +1014,7 @@ function autoPlay() {
                                         background-color: white;
                                         font-weight: 700;
                                     }
+
                                     .content-about-us-content-box-card-text-button-text {
                                         font-size: 25px;
                                         font-weight: 700;
@@ -850,6 +1025,7 @@ function autoPlay() {
                                         align-items: center;
                                     }
                                 }
+
                                 .content-about-us-content-box-card-text-desp {
                                     font-size: 20px;
                                     font-weight: 700;
@@ -863,7 +1039,40 @@ function autoPlay() {
             }
         }
 
-        .content-about-us {
+        .content-our-story {
+            width: 100%;
+            height: 150vh;
+            background-color: lightgray;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .content-our-story-content {
+                width: 100%;
+                height: 100%;
+                padding-top: 15%;
+                padding-left: 10%;
+
+                // background-color: antiquewhite;
+                .content-our-story-content-title {
+                    width: 100%;
+
+                    h3 {
+                        font-size: 70px;
+                        font-weight: 700;
+                        color: #003B68;
+                    }
+
+                    p {
+                        font-size: 25px;
+                        font-weight: 700;
+                        color: #313334;
+                    }
+                }
+            }
+        }
+
+        .content-our-job {
             width: 100%;
             height: 100vh;
             // background-color: blanchedalmond;
@@ -879,6 +1088,136 @@ function autoPlay() {
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+
+        .footer {
+            width: 100%;
+            height: 100vh;
+            background-color: #003B68;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .footer-content {
+                width: 100%;
+                height: 100%;
+                padding: 5% 5% 5%;
+                background-color: #003B68;
+                box-sizing: border-box;
+
+                .footer-content-link {
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-evenly;
+
+                    .footer-content-link-item {
+                        width: 100%;
+                        display: flex;
+                        align-items: end;
+
+                        .footer-content-link-item-left {
+                            font-size: 40px;
+                            font-weight: 700;
+                            color: white;
+                            padding: 10px 0;
+                            width: 20%;
+                            position: relative;
+
+                            // background-color: aquamarine;
+                            &::after {
+                                content: "";
+                                position: absolute;
+                                bottom: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 3px;
+
+                                background-color: white;
+                            }
+                        }
+
+                        .footer-content-link-item-right {
+                            width: 100%;
+                            font-size: 20px;
+                            font-weight: 700;
+                            color: white;
+                            padding: 10px 0;
+                            display: flex;
+                            position: relative;
+
+                            p {
+                                padding: 0 10px;
+                            }
+
+                            &::after {
+                                content: "";
+                                position: absolute;
+                                bottom: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 3px;
+
+                                background-color: lightblue;
+                            }
+                        }
+
+
+                    }
+
+                    .footer-content-bigtext {
+                        margin-top: 20px;
+                        width: 100%;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+
+                        .footer-content-bigtext-left {
+                            display: flex;
+                            align-items: baseline;
+
+                            h3 {
+                                font-size: 160px;
+                                font-weight: 700;
+                                color: white;
+                            }
+
+                            h4 {
+                                font-size: 70px;
+                                font-weight: 700;
+                                color: white;
+                                margin-left: 50px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .backtotop {
+        position: fixed;
+        bottom: 8%;
+        right: 4%;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: larger;
+        box-sizing: border-box;
+        box-shadow: 0 0 5px gray;
+        cursor: pointer;
+        transition: all .2s linear;
+        &:hover {
+            background-color: #003B68;
+            color: white;
+            border: 1px solid white;
+            box-sizing: border-box;
+            scale: 1.5;
         }
     }
 }
