@@ -203,7 +203,7 @@ const loginUser = ref('') // 儲存目前登入使用者
 const loginBox = ref(false) // 登入框顯示
 const userState = ref(false) // 是否為登入狀態
 const logoutBox = ref(false) // 登出框顯示
-async function createNewUser() {
+const createNewUser = async() => {
     try {
         debounceMessage('註冊新使用者中');
         await firebase.auth().createUserWithEmailAndPassword(userEmail.value, userPassword.value);
@@ -218,7 +218,7 @@ async function createNewUser() {
         // alert('註冊失敗，帳號格式錯誤或密碼未達6位數規範，請重新註冊');
     }
 }
-async function userLogin() {
+const userLogin = async() => {
     try {
         const res = await firebase.auth().signInWithEmailAndPassword(userEmail.value, userPassword.value)
         console.log('登入成功');
@@ -236,7 +236,7 @@ async function userLogin() {
     }
 }
 
-async function userCheck() {
+ const userCheck = async() => {
     const user = firebase.auth().currentUser
     if (user) {
         console.log('已登入')
@@ -265,7 +265,7 @@ async function userCheck() {
 // 註冊登入功能
 
 // 註冊登出功能
-function userLogout() {
+const userLogout = () => {
     // userEmail.value = ''
     // userPassword.value = ''
     loginUser.value = ''
@@ -280,7 +280,7 @@ function userLogout() {
 // 註冊登出功能
 
 //回到頂部功能
-function backToTop() {
+const backToTop = () => {
     window.scrollTo({
         top: 0,
         behavior: 'smooth'
@@ -309,7 +309,7 @@ const favoriteAnimeList = ref({
 })
 // console.log(favoriteAnimeList.value.data.user[0].loveanimelist);
 // const favoriteAnimeList = ref([])
-function addFavorite(userid, animeid) {
+const addFavorite = (userid, animeid) => {
     const userIndex = favoriteAnimeList.value.data.user.findIndex((item) => {
         return item.uid == userUid.value
     }) //獲得當前登入使用者的資料位於數列中的索引值
@@ -321,7 +321,7 @@ function addFavorite(userid, animeid) {
 //加到最愛
 
 //刪除最愛
-function cancelFavoriteAnime(animeid) {
+const cancelFavoriteAnime = (animeid) => {
     const userIndex = favoriteAnimeList.value.data.user.findIndex((item) => {
         return item.uid == userUid.value
     }) //獲得當前登入使用者的資料位於數列中的索引值
@@ -335,7 +335,7 @@ function cancelFavoriteAnime(animeid) {
 //刪除最愛
 
 //判斷是否在我的最愛
-function checkAnimeInFavoriteList(useruid, animeid) {
+const checkAnimeInFavoriteList = (useruid, animeid) => {
     const nowUserData = favoriteAnimeList.value.data.user.find((item) => {
         return item.uid == useruid
     })
@@ -359,7 +359,7 @@ const userInfoBox = ref(false)
 const loginUserIndex = ref('')
 const loginUserFavoriteList = ref([])
 const loginUserFavoriteListId = ref([])
-function getFavoriteList() {
+const getFavoriteList = () => {
     loginUserFavoriteList.value = []
     loginUserIndex.value = favoriteAnimeList.value.data.user.findIndex((item) => {
         return item.uid == userUid.value
@@ -384,14 +384,14 @@ window.addEventListener('scroll', () => {
 //判斷頁面是否滾動離開頂部功能
 
 //我的最愛列表-刪除我的最愛項目
-function deleteFavoritelistItem(animeid) {
+const deleteFavoritelistItem = (animeid) => {
     cancelFavoriteAnime(animeid)
     getFavoriteList()
 }
 //我的最愛列表-刪除我的最愛項目
 
 //獲取firebase資料庫存放的使用者資料
-async function getDatabaseData() {
+const getDatabaseData = async() => {
     const database = getDatabase()
     const snapshot = await get(databaseRef(database, 'data'))
     console.log(snapshot.val());
@@ -406,7 +406,7 @@ async function getDatabaseData() {
 //獲取firebase資料庫存放的使用者資料
 
 //確認firebase資料庫是否有存放使用者資料
-async function checkDatabaseData(data) {
+const checkDatabaseData = async(data) => {
     const database = getDatabase()
     const snapshot = await get(databaseRef(database, 'data'))
     console.log(snapshot.val().user);
@@ -424,7 +424,7 @@ async function checkDatabaseData(data) {
 //確認firebase資料庫是否有存放使用者資料
 
 //新增使用者資料到firebase資料庫
-async function addDatabasedata(data) {
+const addDatabasedata = async(data) => {
     const database = getDatabase()
     const snapshot = await get(databaseRef(database, 'data'))
     console.log(snapshot.val());
@@ -461,7 +461,7 @@ async function addDatabasedata(data) {
 //新增使用者資料到firebase資料庫
 
 //預設用資料
-async function addDefaultData() {
+const addDefaultData = async() => {
     const database = getDatabase()
     const snapshot = await get(databaseRef(database, 'data'))
     console.log(snapshot.val());
@@ -570,7 +570,7 @@ async function addDefaultData() {
 const messageState = ref(false)
 const messageContent = ref('成功訊息')
 
-function changeMessageBoxState(msg) {
+const changeMessageBoxState = (msg) => {
         messageContent.value = msg
         messageState.value = true
         console.log('開始計時了');
@@ -584,7 +584,7 @@ provide('messageContent', messageContent)
 provide('messageState', messageState)
 // 提示訊息
 
-function debounce(fn, delay) {
+const debounce = (fn, delay) => {
     let timer = null
     return function (...args) {
         if (timer) {
