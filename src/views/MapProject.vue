@@ -136,7 +136,7 @@ const searchNearby = async () => {
         searchData.value.locationRestriction.circle.center = response.value
         const res = await axios.post('https://places.googleapis.com/v1/places:searchNearby', searchData.value, { headers: headers })
         console.log('res', res.data);
-        nearbydata.value = res.data
+        nearbydata.value = res.data //res.data
         console.log(typeof res.data.places[0].currentOpeningHours.openNow);
         getMaps(response.value.latitude, response.value.longitude)
         // moveToPage()
@@ -294,18 +294,16 @@ window.addEventListener('scroll', () => {
             <div class="searchData-title">500公里內20筆搜尋結果</div>
             <div class="searchData-content">
                 <ul class="searchDate-list">
-                    <li class="searchData-list-item" v-for="item in nearbydata.places " :key="item">
+                    <li class="searchData-list-item" v-for="item in nearbydata.places" :key="item">
                         <div>{{ item.displayName.text }}</div>
-                        <div>{{ item.nationalPhoneNumber}}</div>
-                        <div>{{ item.primaryTypeDisplayName
-.text}}</div>
+                        <div>{{ item.nationalPhoneNumber }}</div>
+                        <div>{{ item.primaryTypeDisplayName.text }}</div>
                         <img src="" alt="" srcset="">
                     </li>
                 </ul>
-
             </div>
         </div>
-        <div class="map-function" ">
+        <div class="map-function" style="display: none;">
             <div class="map-function-item">
                 <div class="map-function-item-response">
                     <input type="text" value="" v-model="response">
@@ -318,7 +316,6 @@ window.addEventListener('scroll', () => {
                 </div>
             </div>
         </div>
-
     </div>
 </template>
 

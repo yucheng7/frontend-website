@@ -227,6 +227,7 @@ async function userLogin() {
         debounceMessage('使用者已登入')
         await userCheck()
     } catch (error) {
+        console.log(error);
         console.log(error.message);
         console.log('登入失敗');
         // alert('登入失敗')
