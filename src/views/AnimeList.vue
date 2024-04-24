@@ -197,7 +197,7 @@ const sideToolShow = ref(true)
 
 // 註冊登入功能
 const userEmail = ref('aa102133395@gmail.com')
-const userPassword = ref('123456')
+const userPassword = ref('000000')
 const userUid = ref('') // 目前登入使用者id
 const loginUser = ref('') // 儲存目前登入使用者
 const loginBox = ref(false) // 登入框顯示
@@ -257,7 +257,7 @@ const userCheck = async () => {
                 loveanimelist: []
             })//暫時新增資料
         }
-        await addDatabasedata(userData)
+        // await addDatabasedata(userData)
     }
 }
 
