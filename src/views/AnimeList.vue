@@ -203,7 +203,7 @@ const loginUser = ref('') // 儲存目前登入使用者
 const loginBox = ref(false) // 登入框顯示
 const userState = ref(false) // 是否為登入狀態
 const logoutBox = ref(false) // 登出框顯示
-const createNewUser = async() => {
+const createNewUser = async () => {
     try {
         debounceMessage('註冊新使用者中');
         await firebase.auth().createUserWithEmailAndPassword(userEmail.value, userPassword.value);
@@ -218,7 +218,7 @@ const createNewUser = async() => {
         // alert('註冊失敗，帳號格式錯誤或密碼未達6位數規範，請重新註冊');
     }
 }
-const userLogin = async() => {
+const userLogin = async () => {
     try {
         const res = await firebase.auth().signInWithEmailAndPassword(userEmail.value, userPassword.value)
         console.log('登入成功');
@@ -231,12 +231,12 @@ const userLogin = async() => {
         console.log(error.message);
         console.log('登入失敗');
         // alert('登入失敗')
-        
+
         debounceMessage('登入失敗，帳號或密碼錯誤')
     }
 }
 
- const userCheck = async() => {
+const userCheck = async () => {
     const user = firebase.auth().currentUser
     if (user) {
         console.log('已登入')
@@ -301,7 +301,7 @@ const favoriteAnimeList = ref({
             },
             {
                 email: "aa102133395@gmail.com",
-                uid: "bd9nhZ68dIdfJg52hgeWv4L7uG33",
+                uid: "vdDn6p78AdQGkx3eofGID1RxiT52",
                 loveanimelist: [],
             },
         ]
@@ -329,7 +329,7 @@ const cancelFavoriteAnime = (animeid) => {
     favoriteAnimeList.value.data.user[userIndex].loveanimelist = res
     // console.log(animeid + "已刪除");
     // alert(animeid + "已刪除")
-    
+
     debounceMessage("已移除最愛")
 }
 //刪除最愛
@@ -391,7 +391,7 @@ const deleteFavoritelistItem = (animeid) => {
 //我的最愛列表-刪除我的最愛項目
 
 //獲取firebase資料庫存放的使用者資料
-const getDatabaseData = async() => {
+const getDatabaseData = async () => {
     const database = getDatabase()
     const snapshot = await get(databaseRef(database, 'data'))
     console.log(snapshot.val());
@@ -406,7 +406,7 @@ const getDatabaseData = async() => {
 //獲取firebase資料庫存放的使用者資料
 
 //確認firebase資料庫是否有存放使用者資料
-const checkDatabaseData = async(data) => {
+const checkDatabaseData = async (data) => {
     const database = getDatabase()
     const snapshot = await get(databaseRef(database, 'data'))
     console.log(snapshot.val().user);
@@ -424,7 +424,7 @@ const checkDatabaseData = async(data) => {
 //確認firebase資料庫是否有存放使用者資料
 
 //新增使用者資料到firebase資料庫
-const addDatabasedata = async(data) => {
+const addDatabasedata = async (data) => {
     const database = getDatabase()
     const snapshot = await get(databaseRef(database, 'data'))
     console.log(snapshot.val());
@@ -461,7 +461,7 @@ const addDatabasedata = async(data) => {
 //新增使用者資料到firebase資料庫
 
 //預設用資料
-const addDefaultData = async() => {
+const addDefaultData = async () => {
     const database = getDatabase()
     const snapshot = await get(databaseRef(database, 'data'))
     console.log(snapshot.val());
@@ -571,14 +571,14 @@ const messageState = ref(false)
 const messageContent = ref('成功訊息')
 
 const changeMessageBoxState = (msg) => {
-        messageContent.value = msg
-        messageState.value = true
-        console.log('開始計時了');
-        setTimeout(() => {
-            messageState.value = false
-            console.log('已經過1秒了');
-            messageContent.value = '成功訊息'
-        }, 2000)
+    messageContent.value = msg
+    messageState.value = true
+    console.log('開始計時了');
+    setTimeout(() => {
+        messageState.value = false
+        console.log('已經過1秒了');
+        messageContent.value = '成功訊息'
+    }, 2000)
 }
 provide('messageContent', messageContent)
 provide('messageState', messageState)
@@ -635,9 +635,9 @@ const debounceMessage = debounce(changeMessageBoxState, 1000)
             <transition name="fade">
                 <div class="animelist-content" v-if="pageType == 0 && data.length !== 0" id="animelist-content">
                     <div class="animelist-content-title">{{ filterYear }}年{{
-                seasonChinese }}總共{{
-                data.length
-            }}部
+                        seasonChinese }}總共{{
+                            data.length
+                        }}部
                     </div>
                     <div class="animelist-content-group">
                         <div :class="{ 'animelist-content-item': true }" v-for="(item, i) in data" :key="i">
@@ -678,7 +678,7 @@ const debounceMessage = debounce(changeMessageBoxState, 1000)
             <transition name="fade">
                 <div class="animelist-content" v-if="pageType == 1 && animeTitle.length !== 0" id="animelist-content2">
                     <div class="animelist-content-title">有關{{ animeTitleSave }}的搜尋結果，共{{
-                searchTypeAnimelist.length }}部
+                        searchTypeAnimelist.length }}部
                     </div>
                     <div class="animelist-content-group">
                         <div :class="{ 'animelist-content-item': true }" v-for="(item, i) in searchTypeAnimelist"
@@ -702,7 +702,7 @@ const debounceMessage = debounce(changeMessageBoxState, 1000)
                                 </div>
                                 <div class="animelist-content-item-description-data">
                                     <div class="animelist-content-item-description-data-mediatext">類型:{{
-                item.media_text }}
+                                        item.media_text }}
                                     </div>
                                     <div class="animelist-content-item-description-data-officialsiteurl">
                                         官網:{{ item.official_site_url }}</div>
